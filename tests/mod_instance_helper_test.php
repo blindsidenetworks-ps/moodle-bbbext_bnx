@@ -17,6 +17,7 @@
 namespace bbbext_bnx;
 
 use bbbext_bnx\bigbluebuttonbn\mod_instance_helper;
+use bbbext_bnx\local\service\bnx_settings_service;
 
 /**
  * Tests for the BNX mod_instance_helper lifecycle hooks.
@@ -30,44 +31,57 @@ final class mod_instance_helper_test extends \advanced_testcase {
         $this->resetAfterTest(true);
     }
 
-    public function test_add_instance_creates_bnx_record(): void {
+    public function test_add_instance_persists_settings(): void {
         global $DB;
 
         $module = $this->create_bigbluebutton_activity();
-        $DB->delete_records('bbbext_bnx', ['bigbluebuttonbnid' => $module->id]);
+        $bnxid = $this->ensure_bnx_record($module->id);
+
+        $configplugin = 'bbbext_bnx_locksettings';
+        set_config('cam_editable', 1, $configplugin);
+        set_config('mic_editable', 1, $configplugin);
 
         $helper = new mod_instance_helper();
-        $helper->add_instance((object) ['id' => $module->id]);
+        $helper->add_instance((object) [
+            'id' => $module->id,
+            'enablecam' => 1,
+            'enablemic' => 0,
+        ]);
 
-        $this->assertTrue($DB->record_exists('bbbext_bnx', ['bigbluebuttonbnid' => $module->id]));
+        $service = new bnx_settings_service();
+        $settings = $service->get_settings($bnxid);
+
+        $this->assertSame(1, $settings['enablecam']);
+        $this->assertSame(0, $settings['enablemic']);
     }
 
-    public function test_update_instance_refreshes_timestamp(): void {
+    public function test_update_instance_overwrites_settings(): void {
         global $DB;
 
         $module = $this->create_bigbluebutton_activity();
         $helper = new mod_instance_helper();
 
-        $helper->add_instance((object) ['id' => $module->id]);
-        $record = $DB->get_record('bbbext_bnx', ['bigbluebuttonbnid' => $module->id], '*', MUST_EXIST);
-        $DB->set_field('bbbext_bnx', 'timemodified', 1, ['id' => $record->id]);
+        $bnxid = $this->ensure_bnx_record($module->id);
+        $service = new bnx_settings_service();
+        $service->set_settings($bnxid, ['enablecam' => 0]);
 
-        $helper->update_instance((object) ['id' => $module->id]);
+        $helper->update_instance((object) [
+            'id' => $module->id,
+            'enablecam' => 1,
+        ]);
 
-        $updated = $DB->get_record('bbbext_bnx', ['id' => $record->id], 'timemodified', MUST_EXIST);
-        $this->assertGreaterThan(1, (int)$updated->timemodified);
+        $this->assertSame(1, $service->get_setting($bnxid, 'enablecam'));
     }
 
-    public function test_delete_instance_removes_bnx_records(): void {
+    public function test_delete_instance_removes_settings_only(): void {
         global $DB;
 
         $module = $this->create_bigbluebutton_activity();
         $helper = new mod_instance_helper();
-        $helper->add_instance((object) ['id' => $module->id]);
+        $bnxid = $this->ensure_bnx_record($module->id);
 
-        $bnxrecord = $DB->get_record('bbbext_bnx', ['bigbluebuttonbnid' => $module->id], '*', MUST_EXIST);
         $DB->insert_record('bbbext_bnx_settings', (object) [
-            'bnxid' => $bnxrecord->id,
+            'bnxid' => $bnxid,
             'setting' => 'feature_flag',
             'value' => 1,
             'timemodified' => time(),
@@ -75,13 +89,13 @@ final class mod_instance_helper_test extends \advanced_testcase {
 
         $helper->delete_instance($module->id);
 
-        $this->assertFalse($DB->record_exists('bbbext_bnx', ['bigbluebuttonbnid' => $module->id]));
-        $this->assertFalse($DB->record_exists('bbbext_bnx_settings', ['bnxid' => $bnxrecord->id]));
+        $this->assertTrue($DB->record_exists('bbbext_bnx', ['bigbluebuttonbnid' => $module->id]));
+        $this->assertFalse($DB->record_exists('bbbext_bnx_settings', ['bnxid' => $bnxid]));
     }
 
     public function test_get_join_tables(): void {
         $helper = new mod_instance_helper();
-        $this->assertSame(['bbbext_bnx'], $helper->get_join_tables());
+        $this->assertSame(['bbbext_bnx_settings'], $helper->get_join_tables());
     }
 
     /**
@@ -92,5 +106,27 @@ final class mod_instance_helper_test extends \advanced_testcase {
     private function create_bigbluebutton_activity(): \stdClass {
         $course = $this->getDataGenerator()->create_course();
         return $this->getDataGenerator()->create_module('bigbluebuttonbn', ['course' => $course->id]);
+    }
+
+    /**
+     * Ensure a BNX record exists for the given module id, returning its id.
+     *
+     * @param int $moduleid
+     * @return int
+     */
+    private function ensure_bnx_record(int $moduleid): int {
+        global $DB;
+
+        $record = $DB->get_record('bbbext_bnx', ['bigbluebuttonbnid' => $moduleid]);
+        if ($record) {
+            return (int)$record->id;
+        }
+
+        $now = time();
+        return (int)$DB->insert_record('bbbext_bnx', (object) [
+            'bigbluebuttonbnid' => $moduleid,
+            'timecreated' => $now,
+            'timemodified' => $now,
+        ]);
     }
 }

@@ -32,13 +32,12 @@ final class bnx_settings_service_test extends \advanced_testcase {
     private $bnxid;
 
     protected function setUp(): void {
-        global $DB;
-
         parent::setUp();
         $this->resetAfterTest(true);
 
-        $this->service = new bnx_settings_service($DB);
+        $this->service = new bnx_settings_service();
         $this->bnxid = $this->create_bnx_record();
+        $this->service->delete_settings($this->bnxid);
     }
 
     public function test_set_and_get_settings(): void {
