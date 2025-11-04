@@ -40,6 +40,11 @@ class bnx_settings_service {
     public const BNX_SETTINGS_TABLE = 'bbbext_bnx_settings';
 
     /**
+     * Table storing base bnx records.
+     */
+    private const BNX_TABLE = 'bbbext_bnx';
+
+    /**
      * Fetch settings for a BNX record.
      *
      * @param int $bnxid bnx parent record identifier
@@ -70,6 +75,22 @@ class bnx_settings_service {
         ], 'value', IGNORE_MISSING);
 
         return $record ? (int)$record->value : null;
+    }
+
+    /**
+     * Fetch a single setting value using the module identifier.
+     *
+     * @param int $moduleid module identifier
+     * @param string $name setting name
+     * @return int|null
+     */
+    public function get_setting_for_module(int $moduleid, string $name): ?int {
+        $bnxid = $this->get_bnx_id_for_module($moduleid);
+        if ($bnxid === null) {
+            return null;
+        }
+
+        return $this->get_setting($bnxid, $name);
     }
 
     /**
@@ -141,6 +162,19 @@ class bnx_settings_service {
             'value' => $normalised,
             'timemodified' => $now,
         ]);
+    }
+
+    /**
+     * Resolve the bnx identifier for a module.
+     *
+     * @param int $moduleid module identifier
+     * @return int|null
+     */
+    private function get_bnx_id_for_module(int $moduleid): ?int {
+        global $DB;
+
+        $record = $DB->get_record(self::BNX_TABLE, ['bigbluebuttonbnid' => $moduleid], 'id');
+        return $record ? (int)$record->id : null;
     }
 
     /**

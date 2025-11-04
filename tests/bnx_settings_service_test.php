@@ -42,6 +42,9 @@ final class bnx_settings_service_test extends \advanced_testcase {
     /** @var int */
     private $bnxid;
 
+    /** @var int */
+    private $moduleid;
+
     /**
      * Setup test case.
      *
@@ -89,6 +92,17 @@ final class bnx_settings_service_test extends \advanced_testcase {
     }
 
     /**
+     * Test retrieving a setting using the module identifier.
+     *
+     * @return void
+     */
+    public function test_get_setting_for_module_returns_value(): void {
+        $this->service->set_settings($this->bnxid, ['feature_flag' => 1]);
+
+        $this->assertSame(1, $this->service->get_setting_for_module($this->moduleid, 'feature_flag'));
+    }
+
+    /**
      * Test delete setting.
      *
      * @return void
@@ -127,6 +141,7 @@ final class bnx_settings_service_test extends \advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $module = $this->getDataGenerator()->create_module('bigbluebuttonbn', ['course' => $course->id]);
+        $this->moduleid = (int)$module->id;
 
         $record = $DB->get_record('bbbext_bnx', ['bigbluebuttonbnid' => $module->id]);
         if ($record) {
