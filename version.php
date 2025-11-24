@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component    = 'bbbext_bnx';
-$plugin->release      = '0.1.0-alpha';
+$plugin->release      = '0.1.0-alpha.1';
 $plugin->version      = 2025102300;
 $plugin->requires     = 2025100900.00;
 $plugin->supported    = [501, 502];
