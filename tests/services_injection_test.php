@@ -75,6 +75,16 @@ final class services_injection_test extends advanced_testcase {
                 return 'x';
             }
             /**
+             * Return a mocked setting value when addressed by module id.
+             *
+             * @param int $moduleid Module identifier
+             * @param string $name Setting name
+             * @return string|null mocked setting value
+             */
+            public function get_setting_for_module(int $moduleid, string $name): ?string {
+                return 'x';
+            }
+            /**
              * Record provided settings; no-op for mock implementation.
              *
              * @param int $bnxid BNX identifier
