@@ -27,9 +27,7 @@ namespace bbbext_bnx;
 
 use advanced_testcase;
 use bbbext_bnx\local\services\bnx_settings_service;
-use bbbext_bnx\local\services\data_service;
 use bbbext_bnx\local\services\bnx_settings_service_interface;
-use bbbext_bnx\local\services\data_service_interface;
 
 /**
  * Tests for services injection via set_service()/get_service().
@@ -46,7 +44,6 @@ final class services_injection_test extends advanced_testcase {
         parent::setUp();
         // Ensure default singletons are cleared for test isolation.
         bnx_settings_service::set_service(null);
-        data_service::set_service(null);
     }
 
     /**
@@ -115,41 +112,4 @@ final class services_injection_test extends advanced_testcase {
         bnx_settings_service::set_service(null);
     }
 
-    /**
-     * Test data_service set_service() and get_service().
-     *
-     * @return void
-     */
-    public function test_data_service_set_and_get_service(): void {
-        $this->resetAfterTest(true);
-
-        $mock = new class implements data_service_interface {
-            /**
-             * Return mocked course info for the supplied course id.
-             *
-             * @param int $courseid Course identifier
-             * @return array mocked course info
-             */
-            public function get_course_info(int $courseid): array {
-                return ['course' => ['id' => $courseid, 'fullname' => 'Mock']];
-            }
-            /**
-             * Return mocked enrollment info for the supplied course id.
-             *
-             * @param int $courseid Course identifier
-             * @return array mocked enrollment info
-             */
-            public function get_enrollment(int $courseid): array {
-                return ['enrollment' => []];
-            }
-        };
-
-        data_service::set_service($mock);
-        $svc = data_service::get_service();
-        $this->assertInstanceOf(data_service_interface::class, $svc);
-        $this->assertSame( ['course' => ['id' => 5, 'fullname' => 'Mock']], $svc->get_course_info(5));
-
-        // Clean up.
-        data_service::set_service(null);
-    }
 }
