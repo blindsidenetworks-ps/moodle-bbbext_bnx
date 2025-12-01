@@ -63,6 +63,8 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
 
     /**
      * Initialise the helper with a settings service instance.
+     *
+     * @param bnx_settings_service_interface|null $service optional service override for testing
      */
     public function __construct(?bnx_settings_service_interface $service = null) {
         $this->service = $service ?? bnx_settings_service::get_service();

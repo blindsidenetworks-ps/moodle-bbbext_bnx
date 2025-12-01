@@ -49,6 +49,7 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
      * @param \MoodleQuickForm $mform form instance
      * @param stdClass|null $bigbluebuttonbndata existing module data
      * @param string|null $suffix suffix used when the form fieldset is duplicated
+     * @param bnx_settings_service_interface|null $service optional service override for testing
      */
     public function __construct(
         \MoodleQuickForm &$mform,

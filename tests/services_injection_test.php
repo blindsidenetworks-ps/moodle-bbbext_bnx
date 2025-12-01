@@ -49,8 +49,8 @@ final class services_injection_test extends advanced_testcase {
     /**
      * Test bnx_settings_service set_service() and get_service().
      *
-        * @covers \bbbext_bnx\local\services\bnx_settings_service::set_service
-        * @covers \bbbext_bnx\local\services\bnx_settings_service::get_service
+     * @covers \bbbext_bnx\local\services\bnx_settings_service::set_service
+     * @covers \bbbext_bnx\local\services\bnx_settings_service::get_service
      * @return void
      */
     public function test_settings_service_set_and_get_service(): void {
