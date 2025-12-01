@@ -1,8 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Unit tests for services injection via set_service()/get_service().
  *
  * @package   bbbext_bnx
+ * @copyright 2025 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
 namespace bbbext_bnx;
@@ -13,7 +31,17 @@ use bbbext_bnx\local\services\data_service;
 use bbbext_bnx\local\services\bnx_settings_service_interface;
 use bbbext_bnx\local\services\data_service_interface;
 
+/**
+ * Tests for services injection via set_service()/get_service().
+ *
+ * @package   bbbext_bnx
+ */
 final class services_injection_test extends advanced_testcase {
+    /**
+     * Setup test case.
+     *
+     * @return void
+     */
     protected function setUp(): void {
         parent::setUp();
         // Ensure default singletons are cleared for test isolation.
@@ -21,19 +49,61 @@ final class services_injection_test extends advanced_testcase {
         data_service::set_service(null);
     }
 
+    /**
+     * Test bnx_settings_service set_service() and get_service().
+     *
+     * @return void
+     */
     public function test_settings_service_set_and_get_service(): void {
         $this->resetAfterTest(true);
 
         $mock = new class implements bnx_settings_service_interface {
+            /**
+             * Return mocked settings payload for the supplied BNX id.
+             *
+             * @param int $bnxid BNX identifier
+             * @return array mocked settings collection
+             */
             public function get_settings(int $bnxid): array {
                 return ['mocked' => '1'];
             }
+            /**
+             * Return a single mocked setting value.
+             *
+             * @param int $bnxid BNX identifier
+             * @param string $name Setting name
+             * @return string|null mocked setting value
+             */
             public function get_setting(int $bnxid, string $name): ?string {
                 return 'x';
             }
-            public function set_settings(int $bnxid, array $values): void {}
-            public function delete_settings(int $bnxid): void {}
-            public function delete_setting(int $bnxid, string $name): void {}
+            /**
+             * Record provided settings; no-op for mock implementation.
+             *
+             * @param int $bnxid BNX identifier
+             * @param array $values Settings to persist
+             * @return void
+             */
+            public function set_settings(int $bnxid, array $values): void {
+            }
+            /**
+             * Delete all settings for the mocked BNX id.
+             *
+             * @param int $bnxid BNX identifier
+             * @return void
+             */
+            public function delete_settings(int $bnxid): void {
+            }
+
+            /**
+             * Delete a single mocked setting entry.
+             *
+             * @param int $bnxid BNX identifier
+             * @param string $name Setting name
+             * @return void
+             */
+            public function delete_setting(int $bnxid, string $name): void {
+            }
         };
 
         bnx_settings_service::set_service($mock);
@@ -45,13 +115,30 @@ final class services_injection_test extends advanced_testcase {
         bnx_settings_service::set_service(null);
     }
 
+    /**
+     * Test data_service set_service() and get_service().
+     *
+     * @return void
+     */
     public function test_data_service_set_and_get_service(): void {
         $this->resetAfterTest(true);
 
         $mock = new class implements data_service_interface {
+            /**
+             * Return mocked course info for the supplied course id.
+             *
+             * @param int $courseid Course identifier
+             * @return array mocked course info
+             */
             public function get_course_info(int $courseid): array {
                 return ['course' => ['id' => $courseid, 'fullname' => 'Mock']];
             }
+            /**
+             * Return mocked enrollment info for the supplied course id.
+             *
+             * @param int $courseid Course identifier
+             * @return array mocked enrollment info
+             */
             public function get_enrollment(int $courseid): array {
                 return ['enrollment' => []];
             }

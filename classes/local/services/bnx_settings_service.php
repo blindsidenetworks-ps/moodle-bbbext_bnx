@@ -56,7 +56,7 @@ class bnx_settings_service implements bnx_settings_service_interface {
      * @param self|null $svc
      * @return void
      */
-    public static function set_service(self $svc = null): void {
+    public static function set_service(?self $svc = null): void {
         self::$service = $svc;
     }
 
