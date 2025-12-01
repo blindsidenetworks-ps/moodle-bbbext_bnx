@@ -49,6 +49,8 @@ final class services_injection_test extends advanced_testcase {
     /**
      * Test bnx_settings_service set_service() and get_service().
      *
+        * @covers \bbbext_bnx\local\services\bnx_settings_service::set_service
+        * @covers \bbbext_bnx\local\services\bnx_settings_service::get_service
      * @return void
      */
     public function test_settings_service_set_and_get_service(): void {
@@ -64,6 +66,7 @@ final class services_injection_test extends advanced_testcase {
             public function get_settings(int $bnxid): array {
                 return ['mocked' => '1'];
             }
+
             /**
              * Return a single mocked setting value.
              *
@@ -74,6 +77,7 @@ final class services_injection_test extends advanced_testcase {
             public function get_setting(int $bnxid, string $name): ?string {
                 return 'x';
             }
+
             /**
              * Return a mocked setting value when addressed by module id.
              *
@@ -84,6 +88,7 @@ final class services_injection_test extends advanced_testcase {
             public function get_setting_for_module(int $moduleid, string $name): ?string {
                 return 'x';
             }
+
             /**
              * Record provided settings; no-op for mock implementation.
              *
@@ -93,6 +98,7 @@ final class services_injection_test extends advanced_testcase {
              */
             public function set_settings(int $bnxid, array $values): void {
             }
+
             /**
              * Delete all settings for the mocked BNX id.
              *
@@ -121,5 +127,4 @@ final class services_injection_test extends advanced_testcase {
         // Clean up.
         bnx_settings_service::set_service(null);
     }
-
 }
