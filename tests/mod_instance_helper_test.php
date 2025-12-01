@@ -73,8 +73,8 @@ final class mod_instance_helper_test extends \advanced_testcase {
         $service = bnx_settings_service::get_service();
         $settings = $service->get_settings($bnxid);
 
-        $this->assertSame(1, $settings['enablecam']);
-        $this->assertSame(0, $settings['enablemic']);
+        $this->assertSame('1', $settings['enablecam']);
+        $this->assertSame('0', $settings['enablemic']);
     }
 
     /**
@@ -97,7 +97,7 @@ final class mod_instance_helper_test extends \advanced_testcase {
             'enablecam' => 1,
         ]);
 
-        $this->assertSame(1, $service->get_setting($bnxid, 'enablecam'));
+        $this->assertSame('1', $service->get_setting($bnxid, 'enablecam'));
     }
 
     /**
@@ -114,8 +114,9 @@ final class mod_instance_helper_test extends \advanced_testcase {
 
         $DB->insert_record('bbbext_bnx_settings', (object) [
             'bnxid' => $bnxid,
-            'setting' => 'feature_flag',
-            'value' => 1,
+            'name' => 'feature_flag',
+            'value' => '1',
+            'timecreated' => time(),
             'timemodified' => time(),
         ]);
 

@@ -34,16 +34,16 @@ class bnx_settings_service implements bnx_settings_service_interface {
     /**
      * Cached instance for factory.
      *
-     * @var self|null
+     * @var bnx_settings_service_interface|null
      */
-    protected static $service = null;
+    protected static ?bnx_settings_service_interface $service = null;
 
     /**
      * Get the shared service instance (factory).
      *
-     * @return self
+     * @return bnx_settings_service_interface
      */
-    public static function get_service(): self {
+    public static function get_service(): bnx_settings_service_interface {
         if (self::$service === null) {
             self::$service = new self();
         }
@@ -53,11 +53,11 @@ class bnx_settings_service implements bnx_settings_service_interface {
     /**
      * Test hook to override the service instance.
      *
-     * @param self|null $svc
+     * @param bnx_settings_service_interface|null $service
      * @return void
      */
-    public static function set_service(?self $svc = null): void {
-        self::$service = $svc;
+    public static function set_service(?bnx_settings_service_interface $service = null): void {
+        self::$service = $service;
     }
 
     /**

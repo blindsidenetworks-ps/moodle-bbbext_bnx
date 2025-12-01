@@ -73,13 +73,13 @@ final class bnx_settings_service_test extends \advanced_testcase {
         $settings = $this->service->get_settings($this->bnxid);
 
         $this->assertSame([
-            'feature_one' => 1,
-            'feature_two' => 0,
+            'feature_one' => '1',
+            'feature_two' => '0',
         ], $settings);
 
         // Update one value and ensure the change is persisted.
         $this->service->set_settings($this->bnxid, ['feature_one' => false]);
-        $this->assertSame(0, $this->service->get_setting($this->bnxid, 'feature_one'));
+        $this->assertSame('0', $this->service->get_setting($this->bnxid, 'feature_one'));
     }
 
     /**
@@ -99,7 +99,7 @@ final class bnx_settings_service_test extends \advanced_testcase {
     public function test_get_setting_for_module_returns_value(): void {
         $this->service->set_settings($this->bnxid, ['feature_flag' => 1]);
 
-        $this->assertSame(1, $this->service->get_setting_for_module($this->moduleid, 'feature_flag'));
+        $this->assertSame('1', $this->service->get_setting_for_module($this->moduleid, 'feature_flag'));
     }
 
     /**
@@ -109,7 +109,7 @@ final class bnx_settings_service_test extends \advanced_testcase {
      */
     public function test_delete_setting(): void {
         $this->service->set_settings($this->bnxid, ['feature_flag' => 1]);
-        $this->assertSame(1, $this->service->get_setting($this->bnxid, 'feature_flag'));
+        $this->assertSame('1', $this->service->get_setting($this->bnxid, 'feature_flag'));
 
         $this->service->delete_setting($this->bnxid, 'feature_flag');
         $this->assertNull($this->service->get_setting($this->bnxid, 'feature_flag'));
