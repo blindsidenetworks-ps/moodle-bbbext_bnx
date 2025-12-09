@@ -30,15 +30,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - php: '8.4'
-            # Main job. Run all checks that do not require setup and only need to be run once.
-            runchecks: 'all'
-            moodle-branch: 'main'
-            database: 'pgsql'
-          - php: '8.2'
-            moodle-branch: 'main'
-            database: 'mariadb'
+        php: ['8.4']
+        runchecks: ['all']
+        moodle-branch: ['MOODLE_501_STABLE', 'main']
+        database: ['pgsql', 'mariadb']
 
     steps:
       - name: Check out repository code

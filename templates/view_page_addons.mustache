@@ -31,6 +31,8 @@
 }}
 {{{groupselector}}}
 
+<span class="bbbext-bnx-navlabel" data-label="{{#str}}secondarynavlabel, bbbext_bnx{{/str}}" hidden></span>
+
 {{#serverwarning}}
   {{>core/notification}}
 {{/serverwarning}}
@@ -39,7 +41,7 @@
   {{>core/local/notification/cta}}
 {{/sitenotification}}
 
-<h3>{{meetingname}} (Override)</h3>
+<h3>{{meetingname}}</h3>
 
 <h5>{{{meetingdescription}}}</h5>
 
@@ -50,6 +52,12 @@
 {{#recordings}}
     {{>bbbext_bnx/recordings_session}}
 {{/recordings}}
+
+{{#js}}
+require(['bbbext_bnx/overridenav'], function(overridenav) {
+    overridenav.init();
+});
+{{/js}}
 
 {{#js}}
 require(['mod_bigbluebuttonbn/rooms'], function(rooms) {
