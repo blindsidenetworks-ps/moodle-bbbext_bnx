@@ -25,12 +25,6 @@
 
 namespace bbbext_bnx\bigbluebuttonbn;
 
-defined('MOODLE_INTERNAL') || die();
-
-use mod_bigbluebuttonbn\instance;
-use renderer_base;
-use stdClass;
-
 /**
  * BNX view override scaffold delegating to the core implementation.
  *
@@ -40,22 +34,5 @@ use stdClass;
  * @package   bbbext_bnx
  */
 class view_page_addons extends \mod_bigbluebuttonbn\local\extension\view_page_addons {
-	/**
-	 * Pass constructor through to the parent so core logic remains unchanged.
-	 *
-	 * @param instance $instance Activity instance being rendered
-	 */
-	public function __construct(instance $instance) {
-		parent::__construct($instance);
-	}
-
-	/**
-	 * Delegate template export to the parent implementation verbatim.
-	 *
-	 * @param renderer_base $output The renderer preparing the view page
-	 * @return stdClass Template context from the core view
-	 */
-	public function export_for_template(renderer_base $output): stdClass {
-		return parent::export_for_template($output);
-	}
+    // The BNX extension reuses the core view behaviour without customisation for now.
 }

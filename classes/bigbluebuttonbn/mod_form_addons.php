@@ -69,7 +69,13 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
      * @return void
      */
     public function data_postprocessing(stdClass &$data): void {
-        // BNX currently leaves post-processing unchanged.
+        foreach (mod_instance_helper::FEATURE_FIELD_MAP as $field => $setting) {
+            if (!property_exists($data, $field)) {
+                continue;
+            }
+
+            $data->{$field} = (int)!empty($data->{$field});
+        }
     }
 
     /**
@@ -123,7 +129,22 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
      * @return array
      */
     public function validation(array $data, array $files): array {
-        return [];
+        $errors = [];
+
+        foreach (mod_instance_helper::FEATURE_FIELD_MAP as $field => $setting) {
+            if (!array_key_exists($field, $data)) {
+                continue;
+            }
+
+            $value = $data[$field];
+            if (!is_bool($value) && !is_numeric($value)) {
+                $errors[$field] = get_string('err_numeric', 'form');
+            }
+        }
+
+        unset($files);
+
+        return $errors;
     }
 
     /**

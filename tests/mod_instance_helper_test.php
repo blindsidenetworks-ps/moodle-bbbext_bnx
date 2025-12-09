@@ -54,8 +54,6 @@ final class mod_instance_helper_test extends \advanced_testcase {
      * @return void
      */
     public function test_add_instance_persists_settings(): void {
-        global $DB;
-
         $module = $this->create_bigbluebutton_activity();
         $bnxid = $this->ensure_bnx_record($module->id);
 
@@ -83,8 +81,6 @@ final class mod_instance_helper_test extends \advanced_testcase {
      * @return void
      */
     public function test_update_instance_overwrites_settings(): void {
-        global $DB;
-
         $module = $this->create_bigbluebutton_activity();
         $helper = new mod_instance_helper();
 

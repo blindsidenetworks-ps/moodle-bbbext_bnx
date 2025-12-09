@@ -57,6 +57,9 @@ final class services_injection_test extends advanced_testcase {
         $this->resetAfterTest(true);
 
         $mock = new class implements bnx_settings_service_interface {
+            /** @var array<int, array> */
+            private array $persisted = [];
+
             /**
              * Return mocked settings payload for the supplied BNX id.
              *
@@ -64,7 +67,7 @@ final class services_injection_test extends advanced_testcase {
              * @return array mocked settings collection
              */
             public function get_settings(int $bnxid): array {
-                return ['mocked' => '1'];
+                return $this->persisted[$bnxid] ?? ['mocked' => (string)$bnxid];
             }
 
             /**
@@ -75,7 +78,7 @@ final class services_injection_test extends advanced_testcase {
              * @return string|null mocked setting value
              */
             public function get_setting(int $bnxid, string $name): ?string {
-                return 'x';
+                return $this->persisted[$bnxid][$name] ?? null;
             }
 
             /**
@@ -86,7 +89,7 @@ final class services_injection_test extends advanced_testcase {
              * @return string|null mocked setting value
              */
             public function get_setting_for_module(int $moduleid, string $name): ?string {
-                return 'x';
+                return $this->persisted[$moduleid][$name] ?? null;
             }
 
             /**
@@ -97,6 +100,7 @@ final class services_injection_test extends advanced_testcase {
              * @return void
              */
             public function set_settings(int $bnxid, array $values): void {
+                $this->persisted[$bnxid] = $values;
             }
 
             /**
@@ -106,6 +110,7 @@ final class services_injection_test extends advanced_testcase {
              * @return void
              */
             public function delete_settings(int $bnxid): void {
+                unset($this->persisted[$bnxid]);
             }
 
             /**
@@ -116,13 +121,14 @@ final class services_injection_test extends advanced_testcase {
              * @return void
              */
             public function delete_setting(int $bnxid, string $name): void {
+                unset($this->persisted[$bnxid][$name]);
             }
         };
 
         bnx_settings_service::set_service($mock);
         $svc = bnx_settings_service::get_service();
         $this->assertInstanceOf(bnx_settings_service_interface::class, $svc);
-        $this->assertSame(['mocked' => '1'], $svc->get_settings(123));
+        $this->assertSame(['mocked' => '123'], $svc->get_settings(123));
 
         // Clean up.
         bnx_settings_service::set_service(null);
