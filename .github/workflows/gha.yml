@@ -32,8 +32,8 @@ jobs:
       matrix:
         php: ['8.3']
         runchecks: ['all']
-        moodle-branch: ['MOODLE_501_STABLE']
-        database: ['mariadb']
+        moodle-branch: ['MOODLE_501_STABLE', 'main']
+        database: ['mariadb', 'pgsql']
 
     steps:
       - name: Check out repository code
