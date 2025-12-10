@@ -41,16 +41,29 @@
   {{>core/local/notification/cta}}
 {{/sitenotification}}
 
-<h3>{{meetingname}}</h3>
+{{#meetingname}}
+    <h3>{{meetingname}}</h3>
+{{/meetingname}}
 
-<h5>{{{meetingdescription}}}</h5>
+{{#meetingdescription}}
+    <h5>{{{meetingdescription}}}</h5>
+{{/meetingdescription}}
 
 {{#room}}
     {{>bbbext_bnx/room_view}}
 {{/room}}
 
 {{#recordings}}
-    {{>bbbext_bnx/recordings_session}}
+    <div class="mod_bigbluebuttonbn_recordings">
+        {{< bbbext_bnx/recordings_table}}
+            {{$title}}{{#str}}view_section_title_recordings, mod_bigbluebuttonbn{{/str}}{{/title}}
+        {{/bbbext_bnx/recordings_table}}
+        <div class="mt-3">
+            {{#session.import_button}}
+                {{>core/single_button}}
+            {{/session.import_button}}
+        </div>
+    </div>
 {{/recordings}}
 
 {{#js}}
@@ -60,11 +73,14 @@ require(['bbbext_bnx/overridenav'], function(overridenav) {
 {{/js}}
 
 {{#js}}
+{{#instanceid}}
+{{#pollinterval}}
 require(['mod_bigbluebuttonbn/rooms'], function(rooms) {
-    // Register action on all buttons.
     rooms.init(
         {{instanceid}},
         {{pollinterval}}
         );
     });
+{{/pollinterval}}
+{{/instanceid}}
 {{/js}}

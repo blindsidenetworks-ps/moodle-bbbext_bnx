@@ -129,7 +129,7 @@ final class mod_instance_helper_test extends \advanced_testcase {
      */
     public function test_get_join_tables(): void {
         $helper = new mod_instance_helper();
-        $this->assertSame(['bbbext_bnx', 'bbbext_bnx_settings'], $helper->get_join_tables());
+        $this->assertSame(['bbbext_bnx'], $helper->get_join_tables());
     }
 
     /**

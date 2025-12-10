@@ -120,7 +120,6 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
     public function get_join_tables(): array {
         return [
             self::BNX_TABLE,
-            bnx_settings_service::BNX_SETTINGS_TABLE,
         ];
     }
 

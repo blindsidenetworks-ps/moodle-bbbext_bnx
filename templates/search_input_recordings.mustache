@@ -17,38 +17,20 @@
 {{!
     @template bbbext_bnx/search_input_recordings
 
-    BNX copy of the recordings search input component.
+    Search input that auto searches. Inspired from the core/search_input_auto but
+    does not use a unique id for the search input.
+    Add a submit button and clear button.
 
     Example context (json):
     {
-        "action": "https://moodle.local/admin/search.php",
-        "extraclasses": "my-2",
-        "inputname": "search",
-        "searchstring": "Search settings",
-        "sesskey": "sesskey",
-        "value": "policy",
-        "btnclass": "primary"
     }
 }}
-<div id="searchform-auto-{{uniqid}}" class="d-flex flex-wrap align-items-center simplesearchform">
-    <div class="input-group searchbar" role="search">
-        <label for="mod_bigbluebutton_search-{{uniqid}}">
-            <span class="visually-hidden">{{$label}}{{#str}} search, core {{/str}}{{/label}}</span>
-        </label>
-        <input
-           type="text"
-           id="mod_bigbluebutton_search-{{uniqid}}"
-           data-region="input"
-           data-action="search"
-           class="form-control withclear"
-           placeholder="{{$placeholder}}{{#str}} search, core {{/str}}{{/placeholder}}"
-           name="search"
-           value="{{$value}}{{/value}}"
-           autocomplete="off"
-        >
-        <button type="submit" class="btn {{^btnclass}}btn-submit{{/btnclass}} {{ btnclass }} search-icon">
-            {{#pix}} a/search, core {{/pix}}
-            <span class="visually-hidden">{{ searchstring }}</span>
-        </button>
-    </div>
+<div class="d-flex justify-content-end align-items-center mb-3">
+    <input id="recordings-search-input" type="text"
+           class="form-control form-control-sm w-auto mr-2"
+           style="max-width: 300px;"
+           placeholder="{{#str}}view_recording_search_placeholder, bbbext_bnx{{/str}}">
+    <button id="recordings-search-button" class="btn btn-sm btn-primary">
+        {{#str}}view_recording_search, bbbext_bnx{{/str}}
+    </button>
 </div>

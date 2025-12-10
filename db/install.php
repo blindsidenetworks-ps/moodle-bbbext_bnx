@@ -15,19 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for BigBlueButton BN Experience
+ * Install script for BigBlueButton Override Recordings View
  *
- * @package   bbbext_bnx
- * @copyright 2025 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * Documentation: {@link https://moodledev.io/docs/guides/upgrade}
+ *
+ * @package    bbbext_bnx
+ * @copyright  2025 Blindside Networks Inc
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author     Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component    = 'bbbext_bnx';
-$plugin->release      = '0.1.0-alpha.3';
-$plugin->version      = 2025121000;
-$plugin->requires     = 2025100600; // Moodle 5.1.0 minimum.
-$plugin->supported    = [501, 502];
-$plugin->maturity     = MATURITY_ALPHA;
+/**
+ * Perform the post-install procedures.
+ *
+ * @return bool
+ */
+function xmldb_bbbext_bnx_install() {
+    // Enable the plugin by default.
+    set_config('enabled', 1, 'bbbext_bnx');
+}

@@ -28,3 +28,5 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'BigBlueButton BN Experience';
 $string['privacy:metadata'] = 'The BigBlueButton BN Experience plugin doesn\'t store any personal data.';
 $string['secondarynavlabel'] = 'BigBlueButton +';
+$string['view_recording_search'] = 'Search';
+$string['view_recording_search_placeholder'] = 'Search for recordings';
