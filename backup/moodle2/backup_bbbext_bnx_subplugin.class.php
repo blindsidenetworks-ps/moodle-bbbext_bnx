@@ -37,8 +37,8 @@ class backup_bbbext_bnx_subplugin extends backup_subplugin {
             'timemodified',
         ]);
 
-        $settings = new backup_nested_element('bbbext_bnxsettings', ['id'], [
-            'setting',
+        $settings = new backup_nested_element('bbbext_bnx_settings', ['id'], [
+            'name',
             'value',
             'timemodified',
         ]);
@@ -51,7 +51,7 @@ class backup_bbbext_bnx_subplugin extends backup_subplugin {
             'bigbluebuttonbnid' => backup::VAR_PARENTID,
         ]);
 
-        $settings->set_source_table('bbbext_bnxsettings', [
+        $settings->set_source_table('bbbext_bnx_settings', [
             'bnxid' => backup::VAR_PARENTID,
         ]);
 
