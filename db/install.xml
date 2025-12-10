@@ -20,7 +20,6 @@
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="Primary key"/>
                 <FIELD NAME="bnxid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key to bbbext_bnx.id"/>
-                <FIELD NAME="bigbluebuttonbnid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Related bigbluebuttonbn instance id"/>
                 <FIELD NAME="name" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="Feature key name (e.g. webcam, chat, notes)"/>
                 <FIELD NAME="value" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Setting value; stores string data (e.g. '1' or arbitrary text)"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -29,7 +28,6 @@
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
                 <KEY NAME="bnxid_fk" TYPE="foreign" FIELDS="bnxid" REFTABLE="bbbext_bnx" REFFIELDS="id"/>
-                <KEY NAME="bnx_settings_bbbid_fk" TYPE="foreign" FIELDS="bigbluebuttonbnid" REFTABLE="bigbluebuttonbn" REFFIELDS="id"/>
                 <KEY NAME="bnx_setting_unique" TYPE="unique" FIELDS="bnxid, name"/>
             </KEYS>
         </TABLE>

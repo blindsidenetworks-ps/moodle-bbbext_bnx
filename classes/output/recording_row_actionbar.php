@@ -63,7 +63,7 @@ class recording_row_actionbar extends base_recording_row_actionbar {
                         'id' => $id,
                         'data-action' => $buttonpayload['action'],
                         'data-require-confirmation' => !empty($buttonpayload['requireconfirmation']),
-                        'class' => 'action-icon'
+                        'class' => 'action-icon',
                     ];
                     if ($this->recording->get('imported')) {
                         $linkattributes['data-links'] = recording::count_records(

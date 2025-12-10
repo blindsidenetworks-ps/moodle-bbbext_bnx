@@ -47,6 +47,8 @@ class view_page_addons extends \mod_bigbluebuttonbn\local\extension\view_page_ad
     protected $instance;
 
     /**
+     * Construct the renderable for a specific instance.
+     *
      * @param instance $instance BigBlueButton instance being rendered.
      */
     public function __construct(instance $instance) {

@@ -18,8 +18,23 @@
     @template bbbext_bnx/recording_row_actionbar
 
     Render the action buttons for a single recording entry.
+
+    Example context (json):
+    {
+        "id": "recording-actionbar-123",
+        "recordingid": "123",
+        "tools": [
+            {
+                "url": "#",
+                "text": "<span class=\"icon\">…</span>",
+                "attributes": {
+                    "class": "action-icon"
+                }
+            }
+        ]
+    }
 }}
-<div id="{{id}}" data-recordingid="{{recordingid}}">
+<div {{#id}}id="{{.}}"{{/id}} {{#recordingid}}data-recordingid="{{.}}"{{/recordingid}}>
     <div class="d-flex flex-row">
         {{#tools}}
             <div>

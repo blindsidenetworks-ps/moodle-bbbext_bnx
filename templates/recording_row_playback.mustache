@@ -18,9 +18,29 @@
     @template bbbext_bnx/recording_row_playback
 
     Render the playback links for a single recording entry.
+
+    Example context (json):
+    {
+        "id": "playbacks-abc",
+        "dataimported": "1",
+        "recordingid": "abc",
+        "additionaloptions": "{\"foo\":\"bar\"}",
+        "playbacks": [
+            {
+                "url": "#",
+                "text": "Play",
+                "attributes": {
+                    "class": "action-icon"
+                }
+            }
+        ]
+    }
 }}
-<div id="{{id}}" data-imported="{{dataimported}}" data-recordingid="{{recordingid}}" data-additionaloptions="{{additionaloptions}}"
-     title="{{#dataimported}}{{#str}}view_recording_link_warning, bigbluebuttonbn{{/str}}{{/dataimported}}">
+<div {{#id}}id="{{.}}"{{/id}}
+     {{#dataimported}}data-imported="{{.}}"{{/dataimported}}
+     {{#recordingid}}data-recordingid="{{.}}"{{/recordingid}}
+     {{#additionaloptions}}data-additionaloptions="{{.}}"{{/additionaloptions}}
+     {{#dataimported}}title="{{#str}}view_recording_link_warning, bigbluebuttonbn{{/str}}"{{/dataimported}}>
     {{#playbacks}}
         <span>
             {{>core/action_link}}

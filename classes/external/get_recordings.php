@@ -99,8 +99,14 @@ class get_recordings extends external_api {
             $returnval['warnings'][] = [
                 'item' => $bigbluebuttonbnid,
                 'warningcode' => 'nosuchinstance',
-                'message' => get_string('nosuchinstance', 'mod_bigbluebuttonbn',
-                    (object) ['id' => $bigbluebuttonbnid, 'entity' => 'bigbluebuttonbn'])
+                'message' => get_string(
+                    'nosuchinstance',
+                    'mod_bigbluebuttonbn',
+                    (object) [
+                        'id' => $bigbluebuttonbnid,
+                        'entity' => 'bigbluebuttonbn',
+                    ]
+                ),
             ];
             return $returnval;
         }
@@ -112,7 +118,7 @@ class get_recordings extends external_api {
             $returnval['warnings'][] = [
                 'item' => $bigbluebuttonbnid,
                 'warningcode' => 'instanceprofilewithoutrecordings',
-                'message' => get_string('instanceprofilewithoutrecordings', 'mod_bigbluebuttonbn')
+                'message' => get_string('instanceprofilewithoutrecordings', 'mod_bigbluebuttonbn'),
             ];
             return $returnval;
         }

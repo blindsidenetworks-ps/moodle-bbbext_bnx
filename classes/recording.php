@@ -51,16 +51,25 @@ class recording extends base_recording {
      * @param bool $viewdeleted view deleted recordings?
      * @return recording[]
      */
+    // phpcs:ignore moodle.Commenting.DocblockTagSniff.InvalidTag
+    /**
+     * Retrieve recordings for a specific instance or its course scope.
+     *
+     * @param instance $instance BigBlueButton instance
+     * @param array $excludedid Instance ids excluded from results
+     * @param bool $viewdeleted Include deleted recordings flag
+     * @return recording[]
+     */
     public static function get_recordings(instance $instance, array $excludedid = [], bool $viewdeleted = false): array {
         if ($instance->is_feature_enabled('showroom')) {
-            return recording::get_recordings_for_instance(
+            return self::get_recordings_for_instance(
                 $instance,
                 $instance->is_feature_enabled('importrecordings'),
                 $instance->get_instance_var('recordings_imported')
             );
         }
 
-        return recording::get_recordings_for_course(
+        return self::get_recordings_for_course(
             $instance->get_course_id(),
             $excludedid,
             $instance->is_feature_enabled('importrecordings'),
@@ -76,6 +85,16 @@ class recording extends base_recording {
      * @param bool $includeimported
      * @param bool $onlyimported
      * @param bool $filterbygroups
+     * @return recording[]
+     */
+    // phpcs:ignore moodle.Commenting.DocblockTagSniff.InvalidTag
+    /**
+     * Retrieve recordings belonging to a single activity instance.
+     *
+     * @param instance $instance BigBlueButton instance
+     * @param bool $includeimported Include imported recordings flag
+     * @param bool $onlyimported Restrict to imported recordings
+     * @param bool $filterbygroups Restrict results by group membership
      * @return recording[]
      */
     public static function get_recordings_for_instance(
@@ -186,22 +205,22 @@ class recording extends base_recording {
             $recordingsort
         );
 
-        $recordingsimported = array_filter($recordings, function ($recording) {
+        $imported = array_filter($recordings, function ($recording) {
             return isset($recording->imported) && (int) $recording->imported === 1;
         });
 
-        $recordingsnonimported = array_filter($recordings, function ($recording) {
+        $nonimported = array_filter($recordings, function ($recording) {
             return isset($recording->imported) && (int) $recording->imported === 0;
         });
 
         $recordingids = array_values(array_map(function ($recording) {
             return $recording->recordingid;
-        }, $recordingsnonimported));
+        }, $nonimported));
 
         $metadatas = recording_proxy::fetch_recordings($recordingids);
         $failedids = recording_proxy::fetch_missing_recordings($recordingids);
 
-        foreach ($recordingsimported as $recording) {
+        foreach ($imported as $recording) {
             if (isset($recording->recordingid, $recording->importeddata)) {
                 $decoded = json_decode($recording->importeddata, true);
                 if (is_array($decoded)) {

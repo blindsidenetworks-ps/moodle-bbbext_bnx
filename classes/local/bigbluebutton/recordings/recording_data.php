@@ -52,8 +52,12 @@ class recording_data extends base_recording_data {
      * @param int $courseid
      * @return array
      */
-    public static function get_recording_table(array $recordings, array $tools, ?instance $instance = null,
-        int $courseid = 0): array {
+    public static function get_recording_table(
+        array $recordings,
+        array $tools,
+        ?instance $instance = null,
+        int $courseid = 0
+    ): array {
         $table = parent::get_recording_table([], $tools, $instance, $courseid);
 
         $rows = [];
@@ -75,25 +79,33 @@ class recording_data extends base_recording_data {
         return $table;
     }
 
+    // phpcs:ignore moodle.Commenting.DocblockTagSniff.InvalidTag
     /**
-     * Helper function builds a row for the data used by the recording table.
+     * Build a single row entry for the recordings table output.
      *
-     * @param instance|null $instance
-     * @param recording $rec
-     * @param array|null $tools
-     * @param int|null $courseid
+     * @param instance|null $instance BigBlueButton instance context
+     * @param recording $rec Recording being rendered
+     * @param array|null $tools Tools available for this recording
+     * @param int|null $courseid Course id when no instance is provided
      * @return stdClass|null
      */
-    public static function row(?instance $instance, recording $rec, ?array $tools = null, ?int $courseid = 0): ?stdClass {
+    public static function row(
+        ?instance $instance,
+        recording $rec,
+        ?array $tools = null,
+        ?int $courseid = 0
+    ): ?stdClass {
         global $PAGE;
-        $hascapabilityincourse = empty($instance) && roles::has_capability_in_course(
-            $courseid,
-            'mod/bigbluebuttonbn:managerecordings'
-        );
+        $tools = $tools ?? [];
+        $hascapabilityincourse = empty($instance)
+            && roles::has_capability_in_course($courseid, 'mod/bigbluebuttonbn:managerecordings');
         $renderer = $PAGE->get_renderer('mod_bigbluebuttonbn');
         foreach ($tools as $key => $tool) {
-            if ((!empty($instance) && !$instance->can_perform_on_recordings($tool))
-                || (empty($instance) && !$hascapabilityincourse)) {
+            $allowed = !empty($instance)
+                ? $instance->can_perform_on_recordings($tool)
+                : $hascapabilityincourse;
+
+            if (!$allowed) {
                 unset($tools[$key]);
             }
         }

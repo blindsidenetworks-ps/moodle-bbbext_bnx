@@ -69,7 +69,7 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
      * @return void
      */
     public function data_postprocessing(stdClass &$data): void {
-        foreach (mod_instance_helper::FEATURE_FIELD_MAP as $field => $setting) {
+        foreach (array_keys(mod_instance_helper::FEATURE_FIELD_MAP) as $field) {
             if (!property_exists($data, $field)) {
                 continue;
             }
@@ -131,7 +131,7 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
     public function validation(array $data, array $files): array {
         $errors = [];
 
-        foreach (mod_instance_helper::FEATURE_FIELD_MAP as $field => $setting) {
+        foreach (array_keys(mod_instance_helper::FEATURE_FIELD_MAP) as $field) {
             if (!array_key_exists($field, $data)) {
                 continue;
             }

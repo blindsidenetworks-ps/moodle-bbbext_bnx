@@ -77,19 +77,20 @@ class get_recordings_to_import extends external_api {
         ]);
     }
 
+    // phpcs:ignore moodle.Commenting.DocblockTagSniff.InvalidTag
     /**
-     * Get the list of recordings available for import.
+     * Build the recordings listing for the import modal.
      *
-     * @param int $destinationinstanceid
-     * @param int|null $sourcebigbluebuttonbnid
-     * @param int|null $sourcecourseid
-     * @param string|null $tools
-     * @param int|null $groupid
+     * @param int $destinstanceid destination activity identifier
+     * @param int|null $sourceinstanceid source activity identifier to filter
+     * @param int|null $sourcecourseid source course identifier to filter
+     * @param string|null $tools comma separated tool list
+     * @param int|null $groupid optional group identifier
      * @return array
      */
     public static function execute(
-        int $destinationinstanceid,
-        ?int $sourcebigbluebuttonbnid = 0,
+        int $destinstanceid,
+        ?int $sourceinstanceid = 0,
         ?int $sourcecourseid = 0,
         ?string $tools = 'protect,unprotect,publish,unpublish,delete',
         ?int $groupid = null
@@ -102,14 +103,14 @@ class get_recordings_to_import extends external_api {
         ];
 
         [
-            'destinationinstanceid' => $destinationinstanceid,
-            'sourcebigbluebuttonbnid' => $sourcebigbluebuttonbnid,
+            'destinationinstanceid' => $destinstanceid,
+            'sourcebigbluebuttonbnid' => $sourceinstanceid,
             'sourcecourseid' => $sourcecourseid,
             'tools' => $tools,
             'groupid' => $groupid,
         ] = self::validate_parameters(self::execute_parameters(), [
-            'destinationinstanceid' => $destinationinstanceid,
-            'sourcebigbluebuttonbnid' => $sourcebigbluebuttonbnid,
+            'destinationinstanceid' => $destinstanceid,
+            'sourcebigbluebuttonbnid' => $sourceinstanceid,
             'sourcecourseid' => $sourcecourseid,
             'tools' => $tools,
             'groupid' => $groupid,
@@ -118,21 +119,19 @@ class get_recordings_to_import extends external_api {
         $tools = explode(',', $tools ?? 'protect,unprotect,publish,unpublish,delete');
 
         $sourceinstance = null;
-        $sourcecourse = null;
         if ($sourcecourseid) {
-            $sourcecourse = $DB->get_record('course', ['id' => $sourcecourseid], '*', MUST_EXIST);
+            $DB->get_record('course', ['id' => $sourcecourseid], 'id', MUST_EXIST);
         }
 
-        if (!empty($sourcebigbluebuttonbnid)) {
-            $sourceinstance = instance::get_from_instanceid($sourcebigbluebuttonbnid);
+        if (!empty($sourceinstanceid)) {
+            $sourceinstance = instance::get_from_instanceid($sourceinstanceid);
             if (!$sourceinstance) {
                 throw new \invalid_parameter_exception('Source BigBlueButton ID is invalid');
             }
-            $sourcecourse = $sourceinstance->get_course();
             self::validate_context($sourceinstance->get_context());
         }
 
-        $destinstance = instance::get_from_instanceid($destinationinstanceid);
+        $destinstance = instance::get_from_instanceid($destinstanceid);
         self::validate_context($destinstance->get_context());
         if (!$destinstance->user_has_group_access($USER, $groupid)) {
             throw new \invalid_parameter_exception('Invalid group for this user ' . $groupid);
@@ -150,25 +149,24 @@ class get_recordings_to_import extends external_api {
                 $excludedids,
                 true,
                 false,
-                ($sourcecourseid == 0 || $sourcebigbluebuttonbnid == 0),
-                ($sourcecourseid == 0 || $sourcebigbluebuttonbnid == 0)
+                ($sourcecourseid == 0 || $sourceinstanceid == 0),
+                ($sourcecourseid == 0 || $sourceinstanceid == 0)
             );
         }
 
-        if ($destinationinstanceid) {
-            $destinationinstance = instance::get_from_instanceid($destinationinstanceid);
+        if ($destinstanceid) {
             $importedrecordings = recording::get_recordings_for_instance(
-                $destinationinstance,
+                $destinstance,
                 true,
                 true
             );
-            foreach ($recordings as $index => $recording) {
-                foreach ($importedrecordings as $irecord) {
-                    if ($irecord->get('recordingid') == $recording->get('recordingid')) {
-                        unset($recordings[$index]);
-                    }
-                }
+            $importedids = [];
+            foreach ($importedrecordings as $importedrecording) {
+                $importedids[$importedrecording->get('recordingid')] = true;
             }
+            $recordings = array_values(array_filter($recordings, static function($recording) use ($importedids) {
+                return empty($importedids[$recording->get('recordingid')]);
+            }));
         }
 
         $tabledata = recording_data::get_recording_table($recordings, $tools, $sourceinstance, $sourcecourseid);

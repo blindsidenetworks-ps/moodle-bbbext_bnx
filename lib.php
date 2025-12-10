@@ -22,9 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author     Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
-
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * In place editable callback for BNX-managed recording fields.
  *
