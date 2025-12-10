@@ -46,6 +46,11 @@ export const setupPagination = () => {
     let currentPage = 1;
     let totalPages = Math.ceil(rows.length / itemsPerPage);
 
+    /**
+     * Show the current slice of rows based on the active page.
+     *
+     * @param {number} page One-based page index to render
+     */
     function renderTable(page) {
         let visibleIndex = 0;
 
@@ -68,6 +73,10 @@ export const setupPagination = () => {
         });
     }
 
+    /**
+     * Recalculate pagination state and refresh control labels.
+     * @returns {Promise<void>}
+     */
     async function updatePaginationControls() {
         const filteredRows = rows.filter(row => row.dataset.filtered !== 'false');
         pageSelect.innerHTML = '';
