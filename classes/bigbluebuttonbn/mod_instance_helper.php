@@ -25,6 +25,8 @@
 
 namespace bbbext_bnx\bigbluebuttonbn;
 
+use bbbext_bnx\local\services\bnx_service;
+use bbbext_bnx\local\services\bnx_service_interface;
 use bbbext_bnx\local\services\bnx_settings_service;
 use bbbext_bnx\local\services\bnx_settings_service_interface;
 use stdClass;
@@ -57,17 +59,28 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
     ];
 
     /**
+     * Service handling persistence of bnx record.
+     * @var bnx_service_interface
+     */
+    private bnx_service_interface $bnxservice;
+
+    /**
      * Service handling persistence of bnx settings.
      * @var bnx_settings_service_interface
      */
     private bnx_settings_service_interface $service;
 
     /**
-     * Initialise the helper with a settings service instance.
+     * Initialise the helper with service instances.
      *
-     * @param bnx_settings_service_interface|null $service optional service override for testing
+     * @param bnx_service_interface|null $bnxservice optional bnx service override for testing
+     * @param bnx_settings_service_interface|null $service optional settings service override for testing
      */
-    public function __construct(?bnx_settings_service_interface $service = null) {
+    public function __construct(
+        ?bnx_service_interface $bnxservice = null,
+        ?bnx_settings_service_interface $service = null
+    ) {
+        $this->bnxservice = $bnxservice ?? bnx_service::get_service();
         $this->service = $service ?? bnx_settings_service::get_service();
     }
 
@@ -109,6 +122,7 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
             return;
         }
 
+        $this->bnxservice->delete_bnx($moduleid);
         $this->service->delete_settings($bnxid);
     }
 

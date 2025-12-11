@@ -97,11 +97,11 @@ final class mod_instance_helper_test extends \advanced_testcase {
     }
 
     /**
-     * Test delete_instance removes settings only.
+     * Test delete_instance.
      *
      * @return void
      */
-    public function test_delete_instance_removes_settings_only(): void {
+    public function test_delete_instance(): void {
         global $DB;
 
         $module = $this->create_bigbluebutton_activity();
@@ -118,7 +118,7 @@ final class mod_instance_helper_test extends \advanced_testcase {
 
         $helper->delete_instance($module->id);
 
-        $this->assertTrue($DB->record_exists('bbbext_bnx', ['bigbluebuttonbnid' => $module->id]));
+        $this->assertFalse($DB->record_exists('bbbext_bnx', ['bigbluebuttonbnid' => $module->id]));
         $this->assertFalse($DB->record_exists('bbbext_bnx_settings', ['bnxid' => $bnxid]));
     }
 
