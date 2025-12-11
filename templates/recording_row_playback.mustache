@@ -27,11 +27,16 @@
         "additionaloptions": "{\"foo\":\"bar\"}",
         "playbacks": [
             {
-                "url": "#",
-                "text": "Play",
-                "attributes": {
-                    "class": "action-icon"
-                }
+                "url": "https://example.org/playback",
+                "id": "recording-play-presentation-abc",
+                "classes": "btn btn-sm btn-default",
+                "attributes": [
+                    {"name": "data-action", "value": "play"},
+                    {"name": "data-target", "value": "presentation"},
+                    {"name": "target", "value": "_blank"},
+                    {"name": "rel", "value": "noopener noreferrer"}
+                ],
+                "text": "Presentation"
             }
         ]
     }

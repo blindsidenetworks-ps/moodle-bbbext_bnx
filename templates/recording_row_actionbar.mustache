@@ -26,10 +26,27 @@
         "tools": [
             {
                 "url": "#",
-                "text": "<span class=\"icon\">…</span>",
-                "attributes": {
-                    "class": "action-icon"
-                }
+                "id": "recording-protect-123",
+                "classes": "action-icon",
+                "attributes": [
+                    {"name": "data-action", "value": "protect"},
+                    {"name": "data-require-confirmation", "value": "0"}
+                ],
+                "text": "Protect"
+            },
+            {
+                "disabled": true,
+                "classes": "action-icon iconsmall disabled",
+                "icon": {
+                    "key": "i/lock",
+                    "component": "moodle",
+                    "title": "Protect"
+                },
+                "attributes": [
+                    {"name": "id", "value": "disabled-recording-protect-123"},
+                    {"name": "aria-disabled", "value": "true"}
+                ],
+                "text": ""
             }
         ]
     }
