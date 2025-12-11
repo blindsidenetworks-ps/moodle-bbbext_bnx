@@ -96,51 +96,157 @@ class recording_data extends base_recording_data {
         ?int $courseid = 0
     ): ?stdClass {
         global $PAGE;
+
         $tools = $tools ?? [];
-        $hascapabilityincourse = empty($instance)
-            && roles::has_capability_in_course($courseid, 'mod/bigbluebuttonbn:managerecordings');
+        $coursecanmanage = self::can_manage_at_course_level($instance, $courseid);
+        $tools = self::filter_tools_for_context($tools, $instance, $rec, $coursecanmanage);
+
+        if (!self::include_recording_table_row($instance, $rec)) {
+            return null;
+        }
+
         $renderer = $PAGE->get_renderer('mod_bigbluebuttonbn');
+        $row = new stdClass();
+
+        $row->playback = self::render_playback_cell($rec, $instance, $renderer);
+        [$row->recording, $row->description] = self::render_recording_cells($rec, $instance, $renderer);
+        $preview = self::render_preview_cell($rec, $instance, $coursecanmanage, $renderer);
+        if ($preview !== null) {
+            $row->preview = $preview;
+        }
+        $row->date = self::normalise_recording_date($rec);
+        $row->duration = self::row_duration($rec);
+
+        $actionbar = self::render_actionbar_cell($rec, $instance, $coursecanmanage, $tools, $renderer);
+        if ($actionbar !== null) {
+            $row->actionbar = $actionbar;
+        }
+
+        return $row;
+    }
+
+    /**
+     * Determine if the user can manage recordings from the wider course context.
+     */
+    private static function can_manage_at_course_level(?instance $instance, ?int $courseid): bool {
+        if (!empty($instance)) {
+            return false;
+        }
+
+        return roles::has_capability_in_course($courseid, 'mod/bigbluebuttonbn:managerecordings');
+    }
+
+    /**
+     * Restrict tools based on permissions and recording state.
+     */
+    private static function filter_tools_for_context(
+        array $tools,
+        ?instance $instance,
+        recording $rec,
+        bool $coursecanmanage
+    ): array {
+        if (!(bool) config::get('recording_protect_editable')) {
+            $tools = array_diff($tools, ['protect', 'unprotect']);
+        }
+
+        if (in_array('protect', $tools, true) && $rec->get('protected') === null) {
+            $tools = array_diff($tools, ['protect', 'unprotect']);
+        }
+
         foreach ($tools as $key => $tool) {
             $allowed = !empty($instance)
                 ? $instance->can_perform_on_recordings($tool)
-                : $hascapabilityincourse;
+                : $coursecanmanage;
 
             if (!$allowed) {
                 unset($tools[$key]);
             }
         }
-        if (!self::include_recording_table_row($instance, $rec)) {
+
+        return $tools;
+    }
+
+    /**
+     * Render the playback column content.
+     */
+    private static function render_playback_cell(
+        recording $rec,
+        ?instance $instance,
+        \renderer_base $renderer
+    ): string {
+        $recordingplayback = new recording_row_playback($rec, $instance);
+        return $renderer->render($recordingplayback);
+    }
+
+    /**
+     * Render the recording name and description cells.
+     *
+     * @return array{0:string,1:string}
+     */
+    private static function render_recording_cells(
+        recording $rec,
+        ?instance $instance,
+        \renderer_base $renderer
+    ): array {
+        if (empty($instance)) {
+            return [$rec->get('name'), $rec->get('description')];
+        }
+
+        $recordingname = new recording_name_editable($rec, $instance);
+        $recordingdescription = new recording_description_editable($rec, $instance);
+
+        return [
+            $renderer->render_inplace_editable($recordingname),
+            $renderer->render_inplace_editable($recordingdescription),
+        ];
+    }
+
+    /**
+     * Render the preview column when available.
+     */
+    private static function render_preview_cell(
+        recording $rec,
+        ?instance $instance,
+        bool $coursecanmanage,
+        \renderer_base $renderer
+    ): ?string {
+        $previewenabled = (!empty($instance) && self::preview_enabled($instance)) || $coursecanmanage;
+        if (!$previewenabled) {
             return null;
         }
-        $row = new stdClass();
 
-        $recordingplayback = new recording_row_playback($rec, $instance);
-        $row->playback = $renderer->render($recordingplayback);
-
-        if (empty($instance)) {
-            $row->recording = $rec->get('name');
-            $row->description = $rec->get('description');
-        } else {
-            $recordingname = new recording_name_editable($rec, $instance);
-            $row->recording = $renderer->render_inplace_editable($recordingname);
-            $recordingdescription = new recording_description_editable($rec, $instance);
-            $row->description = $renderer->render_inplace_editable($recordingdescription);
+        if (!$rec->get('playbacks')) {
+            return null;
         }
 
-        if ((!empty($instance) && self::preview_enabled($instance)) || $hascapabilityincourse) {
-            $row->preview = '';
-            if ($rec->get('playbacks')) {
-                $rowpreview = new recording_row_preview($rec);
-                $row->preview = $renderer->render($rowpreview);
-            }
-        }
+        $rowpreview = new recording_row_preview($rec);
+        return $renderer->render($rowpreview);
+    }
+
+    /**
+     * Convert a recording start time into the table value.
+     */
+    private static function normalise_recording_date(recording $rec): float {
         $starttime = $rec->get('starttime');
-        $row->date = !is_null($starttime) ? floatval($starttime) : 0;
-        $row->duration = self::row_duration($rec);
-        if ((!empty($instance) && $instance->can_manage_recordings()) || $hascapabilityincourse) {
-            $actionbar = new recording_row_actionbar($rec, $tools);
-            $row->actionbar = $renderer->render($actionbar);
+        return $starttime !== null ? (float) $starttime : 0.0;
+    }
+
+    /**
+     * Render the actionbar cell if the user can manage recordings.
+     */
+    private static function render_actionbar_cell(
+        recording $rec,
+        ?instance $instance,
+        bool $coursecanmanage,
+        array $tools,
+        \renderer_base $renderer
+    ): ?string {
+        $canmanage = (!empty($instance) && $instance->can_manage_recordings()) || $coursecanmanage;
+        if (!$canmanage || empty($tools)) {
+            return null;
         }
-        return $row;
+
+        $actionbar = new recording_row_actionbar($rec, $tools);
+        return $renderer->render($actionbar);
     }
 }
