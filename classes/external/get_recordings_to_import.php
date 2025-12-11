@@ -95,85 +95,44 @@ class get_recordings_to_import extends external_api {
         ?string $tools = 'protect,unprotect,publish,unpublish,delete',
         ?int $groupid = null
     ): array {
-        global $USER, $DB;
+        global $USER;
 
-        $returnval = [
-            'status' => false,
+        $params = self::normalise_parameters(
+            $destinstanceid,
+            $sourceinstanceid,
+            $sourcecourseid,
+            $tools,
+            $groupid
+        );
+
+        $toolnames = self::parse_tools($params['tools']);
+        $sourceinstance = self::resolve_source_instance($params['sourcebigbluebuttonbnid']);
+        $destinstance = self::resolve_destination_instance($params['destinationinstanceid']);
+
+        self::assert_group_access($destinstance, $USER, $params['groupid']);
+        if (!empty($params['groupid'])) {
+            $destinstance->set_group_id($params['groupid']);
+        }
+
+        $recordings = self::fetch_candidate_recordings(
+            $sourceinstance,
+            (int) $params['sourcecourseid'],
+            $destinstance,
+            $params['sourcebigbluebuttonbnid']
+        );
+
+        $recordings = self::filter_imported_recordings($recordings, $destinstance);
+
+        return [
+            'status' => true,
             'warnings' => [],
+            'tabledata' => recording_data::get_recording_table(
+                $recordings,
+                $toolnames,
+                $sourceinstance,
+                (int) $params['sourcecourseid']
+            ),
         ];
-
-        [
-            'destinationinstanceid' => $destinstanceid,
-            'sourcebigbluebuttonbnid' => $sourceinstanceid,
-            'sourcecourseid' => $sourcecourseid,
-            'tools' => $tools,
-            'groupid' => $groupid,
-        ] = self::validate_parameters(self::execute_parameters(), [
-            'destinationinstanceid' => $destinstanceid,
-            'sourcebigbluebuttonbnid' => $sourceinstanceid,
-            'sourcecourseid' => $sourcecourseid,
-            'tools' => $tools,
-            'groupid' => $groupid,
-        ]);
-
-        $tools = explode(',', $tools ?? 'protect,unprotect,publish,unpublish,delete');
-
-        $sourceinstance = null;
-        if ($sourcecourseid) {
-            $DB->get_record('course', ['id' => $sourcecourseid], 'id', MUST_EXIST);
-        }
-
-        if (!empty($sourceinstanceid)) {
-            $sourceinstance = instance::get_from_instanceid($sourceinstanceid);
-            if (!$sourceinstance) {
-                throw new \invalid_parameter_exception('Source BigBlueButton ID is invalid');
-            }
-            self::validate_context($sourceinstance->get_context());
-        }
-
-        $destinstance = instance::get_from_instanceid($destinstanceid);
-        self::validate_context($destinstance->get_context());
-        if (!$destinstance->user_has_group_access($USER, $groupid)) {
-            throw new \invalid_parameter_exception('Invalid group for this user ' . $groupid);
-        }
-        if ($groupid) {
-            $destinstance->set_group_id($groupid);
-        }
-
-        $excludedids = [$destinstance->get_instance_id()];
-        if ($sourceinstance) {
-            $recordings = recording::get_recordings($sourceinstance, $excludedids);
-        } else {
-            $recordings = recording::get_recordings_for_course(
-                $sourcecourseid,
-                $excludedids,
-                true,
-                false,
-                ($sourcecourseid == 0 || $sourceinstanceid == 0),
-                ($sourcecourseid == 0 || $sourceinstanceid == 0)
-            );
-        }
-
-        if ($destinstanceid) {
-            $importedrecordings = recording::get_recordings_for_instance(
-                $destinstance,
-                true,
-                true
-            );
-            $importedids = [];
-            foreach ($importedrecordings as $importedrecording) {
-                $importedids[$importedrecording->get('recordingid')] = true;
-            }
-            $recordings = array_values(array_filter($recordings, static function($recording) use ($importedids) {
-                return empty($importedids[$recording->get('recordingid')]);
-            }));
-        }
-
-        $tabledata = recording_data::get_recording_table($recordings, $tools, $sourceinstance, $sourcecourseid);
-        $returnval['tabledata'] = $tabledata;
-        $returnval['status'] = true;
-
-        return $returnval;
     }
 
     /**
@@ -202,5 +161,122 @@ class get_recordings_to_import extends external_api {
             ], '', VALUE_OPTIONAL),
             'warnings' => new external_warnings(),
         ]);
+    }
+
+    /**
+     * Validate and normalise incoming parameters.
+     */
+    private static function normalise_parameters(
+        int $destinstanceid,
+        ?int $sourceinstanceid,
+        ?int $sourcecourseid,
+        ?string $tools,
+        ?int $groupid
+    ): array {
+        global $DB;
+
+        $params = self::validate_parameters(self::execute_parameters(), [
+            'destinationinstanceid' => $destinstanceid,
+            'sourcebigbluebuttonbnid' => $sourceinstanceid,
+            'sourcecourseid' => $sourcecourseid,
+            'tools' => $tools,
+            'groupid' => $groupid,
+        ]);
+
+        if (!empty($params['sourcecourseid'])) {
+            $DB->get_record('course', ['id' => $params['sourcecourseid']], 'id', MUST_EXIST);
+        }
+
+        return $params;
+    }
+
+    /**
+     * Turn the provided tools string into an array list.
+     */
+    private static function parse_tools(?string $tools): array {
+        $toolstring = $tools ?? 'protect,unprotect,publish,unpublish,delete';
+        return array_filter(array_map('trim', explode(',', $toolstring)));
+    }
+
+    /**
+     * Fetch the source instance if provided.
+     */
+    private static function resolve_source_instance(?int $sourceinstanceid): ?instance {
+        if (empty($sourceinstanceid)) {
+            return null;
+        }
+
+        $sourceinstance = instance::get_from_instanceid($sourceinstanceid);
+        if (!$sourceinstance) {
+            throw new \invalid_parameter_exception('Source BigBlueButton ID is invalid');
+        }
+
+        self::validate_context($sourceinstance->get_context());
+
+        return $sourceinstance;
+    }
+
+    /**
+     * Resolve the destination instance for the import workflow.
+     */
+    private static function resolve_destination_instance(int $destinstanceid): instance {
+        $destinstance = instance::get_from_instanceid($destinstanceid);
+        self::validate_context($destinstance->get_context());
+        return $destinstance;
+    }
+
+    /**
+     * Ensure the current user can access the provided group.
+     */
+    private static function assert_group_access(instance $destinstance, \stdClass $user, ?int $groupid): void {
+        if (!$destinstance->user_has_group_access($user, $groupid)) {
+            throw new \invalid_parameter_exception('Invalid group for this user ' . $groupid);
+        }
+    }
+
+    /**
+     * Gather the initial list of recordings candidates.
+     */
+    private static function fetch_candidate_recordings(
+        ?instance $sourceinstance,
+        int $sourcecourseid,
+        instance $destinstance,
+        ?int $sourceinstanceid
+    ): array {
+        $excludedids = [$destinstance->get_instance_id()];
+
+        if ($sourceinstance) {
+            return recording::get_recordings($sourceinstance, $excludedids);
+        }
+
+        $includeall = ($sourcecourseid === 0 || $sourceinstanceid === 0);
+
+        return recording::get_recordings_for_course(
+            $sourcecourseid,
+            $excludedids,
+            true,
+            false,
+            $includeall,
+            $includeall
+        );
+    }
+
+    /**
+     * Remove recordings already imported into the destination instance.
+     */
+    private static function filter_imported_recordings(array $recordings, instance $destinstance): array {
+        $importedrecordings = recording::get_recordings_for_instance($destinstance, true, true);
+        if (empty($importedrecordings)) {
+            return $recordings;
+        }
+
+        $importedids = [];
+        foreach ($importedrecordings as $importedrecording) {
+            $importedids[$importedrecording->get('recordingid')] = true;
+        }
+
+        return array_values(array_filter($recordings, static function($recording) use ($importedids) {
+            return empty($importedids[$recording->get('recordingid')]);
+        }));
     }
 }
