@@ -179,6 +179,9 @@ class recording_data extends base_recording_data {
     /**
      * Render the playback column content.
      *
+     * @param recording $rec
+     * @param instance|null $instance
+     * @param \renderer_base $renderer
      * @return string
      */
     private static function render_playback_cell(
