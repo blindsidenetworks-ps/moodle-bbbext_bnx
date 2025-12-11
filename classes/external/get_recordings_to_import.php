@@ -77,7 +77,6 @@ class get_recordings_to_import extends external_api {
         ]);
     }
 
-    // phpcs:ignore moodle.Commenting.DocblockTagSniff.InvalidTag
     /**
      * Build the recordings listing for the import modal.
      *
@@ -165,6 +164,13 @@ class get_recordings_to_import extends external_api {
 
     /**
      * Validate and normalise incoming parameters.
+     *
+     * @param int $destinstanceid
+     * @param int|null $sourceinstanceid
+     * @param int|null $sourcecourseid
+     * @param string|null $tools
+     * @param int|null $groupid
+     * @return array
      */
     private static function normalise_parameters(
         int $destinstanceid,
@@ -192,6 +198,9 @@ class get_recordings_to_import extends external_api {
 
     /**
      * Turn the provided tools string into an array list.
+     *
+     * @param string|null $tools
+     * @return array
      */
     private static function parse_tools(?string $tools): array {
         $toolstring = $tools ?? 'protect,unprotect,publish,unpublish,delete';
@@ -200,6 +209,10 @@ class get_recordings_to_import extends external_api {
 
     /**
      * Fetch the source instance if provided.
+     *
+     * @param int|null $sourceinstanceid Source instance identifier
+     * @return instance|null
+     * @throws \invalid_parameter_exception
      */
     private static function resolve_source_instance(?int $sourceinstanceid): ?instance {
         if (empty($sourceinstanceid)) {
@@ -218,6 +231,9 @@ class get_recordings_to_import extends external_api {
 
     /**
      * Resolve the destination instance for the import workflow.
+     *
+     * @param int $destinstanceid Destination instance identifier
+     * @return instance
      */
     private static function resolve_destination_instance(int $destinstanceid): instance {
         $destinstance = instance::get_from_instanceid($destinstanceid);
@@ -227,6 +243,11 @@ class get_recordings_to_import extends external_api {
 
     /**
      * Ensure the current user can access the provided group.
+     *
+     * @param instance $destinstance Destination instance
+     * @param \stdClass $user User object
+     * @param int|null $groupid Group ID
+     * @throws \invalid_parameter_exception
      */
     private static function assert_group_access(instance $destinstance, \stdClass $user, ?int $groupid): void {
         if (!$destinstance->user_has_group_access($user, $groupid)) {
@@ -236,6 +257,12 @@ class get_recordings_to_import extends external_api {
 
     /**
      * Gather the initial list of recordings candidates.
+     *
+     * @param instance|null $sourceinstance Source instance to filter by
+     * @param int $sourcecourseid Source course to filter by
+     * @param instance $destinstance Destination instance
+     * @param int|null $sourceinstanceid Source instance identifier
+     * @return recording[]
      */
     private static function fetch_candidate_recordings(
         ?instance $sourceinstance,
@@ -263,6 +290,10 @@ class get_recordings_to_import extends external_api {
 
     /**
      * Remove recordings already imported into the destination instance.
+     *
+     * @param recording[] $recordings
+     * @param instance $destinstance
+     * @return recording[]
      */
     private static function filter_imported_recordings(array $recordings, instance $destinstance): array {
         $importedrecordings = recording::get_recordings_for_instance($destinstance, true, true);

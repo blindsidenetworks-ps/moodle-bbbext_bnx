@@ -49,11 +49,17 @@ class page_context_builder {
     private $modrenderer;
 
     /**
+     * Constructor.
+     *
      * @param instance $instance BigBlueButton instance being rendered.
      * @param renderer_base $output The renderer used for template exporting.
      * @param \mod_bigbluebuttonbn\output\renderer $modrenderer Module renderer for group selector output.
      */
-    public function __construct(instance $instance, renderer_base $output, \mod_bigbluebuttonbn\output\renderer $modrenderer) {
+    public function __construct(
+            instance $instance,
+            renderer_base $output,
+            \mod_bigbluebuttonbn\output\renderer $modrenderer
+            ) {
         $this->instance = $instance;
         $this->output = $output;
         $this->modrenderer = $modrenderer;
