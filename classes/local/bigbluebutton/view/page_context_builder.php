@@ -56,10 +56,10 @@ class page_context_builder {
      * @param \mod_bigbluebuttonbn\output\renderer $modrenderer Module renderer for group selector output.
      */
     public function __construct(
-            instance $instance,
-            renderer_base $output,
-            \mod_bigbluebuttonbn\output\renderer $modrenderer
-            ) {
+        instance $instance,
+        renderer_base $output,
+        \mod_bigbluebuttonbn\output\renderer $modrenderer
+    ) {
         $this->instance = $instance;
         $this->output = $output;
         $this->modrenderer = $modrenderer;

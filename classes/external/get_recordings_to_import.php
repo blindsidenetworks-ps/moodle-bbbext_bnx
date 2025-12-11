@@ -306,7 +306,7 @@ class get_recordings_to_import extends external_api {
             $importedids[$importedrecording->get('recordingid')] = true;
         }
 
-        return array_values(array_filter($recordings, static function($recording) use ($importedids) {
+        return array_values(array_filter($recordings, static function ($recording) use ($importedids) {
             return empty($importedids[$recording->get('recordingid')]);
         }));
     }
