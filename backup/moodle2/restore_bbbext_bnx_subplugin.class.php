@@ -32,13 +32,13 @@ class restore_bbbext_bnx_subplugin extends restore_subplugin {
         $paths = [];
 
         $paths[] = new restore_path_element(
-            $this->get_namefor('bnx'),
+            $this->get_namefor(''),
             $this->get_pathfor('/bbbext_bnx')
         );
 
         $paths[] = new restore_path_element(
             $this->get_namefor('bnxsetting'),
-            $this->get_pathfor('/bbbext_bnx/bbbext_bnxsettings')
+            $this->get_pathfor('/bbbext_bnx/bbbext_bnx_settings')
         );
 
         return $paths;
@@ -49,7 +49,7 @@ class restore_bbbext_bnx_subplugin extends restore_subplugin {
      *
      * @param array $data
      */
-    public function process_bbbext_bnx_bigbluebuttonbn($data) {
+    public function process_bbbext_bnx($data) {
         global $DB;
 
         $data = (object) $data;
@@ -72,11 +72,11 @@ class restore_bbbext_bnx_subplugin extends restore_subplugin {
      *
      * @param array $data
      */
-    public function process_bbbext_bnxsetting_bigbluebuttonbn($data) {
+    public function process_bbbext_bnx_bnxsetting($data) {
         global $DB;
 
         $data = (object) $data;
-        $data->bnxid = $this->get_mappingid('bbbext_bnx', $data->bnxid);
+        $data->bnxid = $this->get_new_parentid('bbbext_bnx');
 
         if (empty($data->bnxid)) {
             // Parent record not restored (unlikely but safe guard).
@@ -86,7 +86,6 @@ class restore_bbbext_bnx_subplugin extends restore_subplugin {
         if (empty($data->timemodified)) {
             $data->timemodified = time();
         }
-
-        $DB->insert_record('bbbext_bnxsettings', $data);
+        $DB->insert_record('bbbext_bnx_settings', $data);
     }
 }
