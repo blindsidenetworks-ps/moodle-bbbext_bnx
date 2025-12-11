@@ -127,6 +127,10 @@ class recording_data extends base_recording_data {
 
     /**
      * Determine if the user can manage recordings from the wider course context.
+     *
+     * @param instance|null $instance
+     * @param int|null $courseid
+     * @return bool
      */
     private static function can_manage_at_course_level(?instance $instance, ?int $courseid): bool {
         if (!empty($instance)) {
@@ -138,6 +142,12 @@ class recording_data extends base_recording_data {
 
     /**
      * Restrict tools based on permissions and recording state.
+     *
+     * @param array $tools
+     * @param instance|null $instance
+     * @param recording $rec
+     * @param bool $coursecanmanage
+     * @return array
      */
     private static function filter_tools_for_context(
         array $tools,
@@ -168,6 +178,8 @@ class recording_data extends base_recording_data {
 
     /**
      * Render the playback column content.
+     *
+     * @return string
      */
     private static function render_playback_cell(
         recording $rec,
@@ -181,6 +193,9 @@ class recording_data extends base_recording_data {
     /**
      * Render the recording name and description cells.
      *
+     * @param recording $rec
+     * @param instance|null $instance
+     * @param \renderer_base $renderer
      * @return array{0:string,1:string}
      */
     private static function render_recording_cells(
@@ -203,6 +218,12 @@ class recording_data extends base_recording_data {
 
     /**
      * Render the preview column when available.
+     *
+     * @param recording $rec
+     * @param instance|null $instance
+     * @param bool $coursecanmanage
+     * @param \renderer_base $renderer
+     * @return string|null
      */
     private static function render_preview_cell(
         recording $rec,
@@ -225,6 +246,9 @@ class recording_data extends base_recording_data {
 
     /**
      * Convert a recording start time into the table value.
+     *
+     * @param recording $rec
+     * @return float
      */
     private static function normalise_recording_date(recording $rec): float {
         $starttime = $rec->get('starttime');
@@ -233,6 +257,13 @@ class recording_data extends base_recording_data {
 
     /**
      * Render the actionbar cell if the user can manage recordings.
+     *
+     * @param recording $rec
+     * @param instance|null $instance
+     * @param bool $coursecanmanage
+     * @param array $tools
+     * @param \renderer_base $renderer
+     * @return string|null
      */
     private static function render_actionbar_cell(
         recording $rec,

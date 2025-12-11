@@ -67,6 +67,8 @@ class page_context_builder {
 
     /**
      * Build the complete template context.
+     *
+     * @return stdClass
      */
     public function build(): stdClass {
         $context = $this->create_base_context();
@@ -93,6 +95,8 @@ class page_context_builder {
 
     /**
      * Create the base context scaffold.
+     *
+     * @return stdClass
      */
     private function create_base_context(): stdClass {
         $pollinterval = bigbluebutton_proxy::get_poll_interval();
@@ -115,6 +119,9 @@ class page_context_builder {
 
     /**
      * Add site wide notifications when applicable.
+     *
+     * @param stdClass $context
+     * @return void
      */
     private function apply_site_notification(stdClass $context): void {
         $message = config::get('general_warning_message');
@@ -141,6 +148,9 @@ class page_context_builder {
 
     /**
      * Flag whether the notification banner should be shown.
+     *
+     * @param string|null $message
+     * @return bool
      */
     private function should_show_site_notification(?string $message): bool {
         if (empty($message)) {
@@ -168,6 +178,9 @@ class page_context_builder {
 
     /**
      * Attach the current room data when the feature is enabled.
+     *
+     * @param stdClass $context
+     * @return void
      */
     private function apply_room_context(stdClass $context): void {
         if (!$this->instance->is_feature_enabled('showroom')) {
@@ -183,6 +196,8 @@ class page_context_builder {
 
     /**
      * Collate any warnings that should be displayed above the recordings table.
+     *
+     * @return array
      */
     private function collect_recording_warnings(): array {
         $warnings = [];
@@ -196,6 +211,8 @@ class page_context_builder {
 
     /**
      * Produce the cron warning when the scheduled tasks are not running.
+     *
+     * @return array|null
      */
     private function build_cron_warning(): ?array {
         if (!$this->instance->is_moderator()) {
@@ -217,6 +234,8 @@ class page_context_builder {
 
     /**
      * Determine if the recordings section should be rendered with data.
+     *
+     * @return bool
      */
     private function should_display_recordings(): bool {
         return $this->instance->is_feature_enabled('showrecordings') && $this->instance->is_recorded();
@@ -224,6 +243,8 @@ class page_context_builder {
 
     /**
      * Export the recordings session metadata for the template.
+     *
+     * @return stdClass
      */
     private function build_recordings_session(): stdClass {
         $recordingssession = new recordings_session($this->instance);
@@ -232,6 +253,8 @@ class page_context_builder {
 
     /**
      * Fetch recordings and normalise the data for the template.
+     *
+     * @return array
      */
     private function fetch_recordings_output(): array {
         try {
@@ -267,6 +290,10 @@ class page_context_builder {
 
     /**
      * Render a notification structure expected by the Mustache templates.
+     *
+     * @param string $message
+     * @param string $type
+     * @return array
      */
     private function render_notification(string $message, string $type): array {
         return (new notification($message, $type, false))->export_for_template($this->output);
