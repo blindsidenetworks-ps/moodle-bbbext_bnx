@@ -30,3 +30,6 @@ $string['privacy:metadata'] = 'The BigBlueButton BN Experience plugin doesn\'t s
 $string['secondarynavlabel'] = 'BigBlueButton +';
 $string['view_recording_search'] = 'Search';
 $string['view_recording_search_placeholder'] = 'Search for recordings';
+$string['preview_toggle_label_singular'] = 'Show one more preview thumbnail';
+$string['preview_toggle_label_plural'] = 'Show {$a} more preview thumbnails';
+$string['preview_toggle_label_close'] = 'Hide additional preview thumbnails';

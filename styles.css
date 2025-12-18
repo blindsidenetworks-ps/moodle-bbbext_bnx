@@ -1,0 +1,32 @@
+
+.bnx-recording-preview {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+}
+
+.bnx-recording-preview img.recording-thumbnail {
+    display: inline-block;
+    width: auto;
+    max-width: 140px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.bnx-recording-preview .bnx-preview-more img.recording-thumbnail {
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    max-width: 120px;
+}
+
+@media (max-width: 767px) {
+    .bnx-recording-preview img.recording-thumbnail {
+        max-width: 110px;
+    }
+
+    .bnx-recording-preview .bnx-preview-more img.recording-thumbnail {
+        max-width: 100px;
+    }
+}

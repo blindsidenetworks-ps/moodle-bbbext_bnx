@@ -146,5 +146,136 @@ const setupTableInteractions = () => {
     });
 };
 
+/**
+ * Enhance recording preview thumbnails with progressive disclosure behaviour.
+ */
+const initPreviewEnhancements = () => {
+    const previewContainers = document.querySelectorAll('[data-bnx-preview]');
+
+    previewContainers.forEach(async(container) => {
+        if (container.dataset.previewReady === '1') {
+            return;
+        }
+
+        container.querySelectorAll('.text-center.text-muted.small').forEach((help) => {
+            const helpContainer = help.closest('.row');
+            if (helpContainer) {
+                helpContainer.remove();
+            } else {
+                help.remove();
+            }
+        });
+
+        const thumbnails = container.querySelectorAll('img.recording-thumbnail');
+        if (thumbnails.length <= 1) {
+            container.dataset.previewReady = '1';
+            return;
+        }
+
+        container.dataset.previewReady = '1';
+        container.classList.add('d-inline-flex', 'flex-column');
+
+        const baseId = container.querySelector('[id]')?.id || `bnx-preview-${Math.random().toString(36).slice(2)}`;
+        const extraWrapper = document.createElement('div');
+        extraWrapper.classList.add('bnx-preview-more', 'd-flex', 'flex-wrap', 'mt-2', 'd-none');
+        extraWrapper.setAttribute('hidden', '');
+        extraWrapper.setAttribute('aria-hidden', 'true');
+        extraWrapper.id = `${baseId}-thumbnails`;
+
+        const toggleButton = document.createElement('button');
+        toggleButton.type = 'button';
+        toggleButton.classList.add('btn', 'btn-link', 'btn-sm', 'p-0', 'ml-1', 'bnx-preview-toggle');
+
+        const restCount = thumbnails.length - 1;
+        toggleButton.textContent = `+${restCount}`;
+        toggleButton.setAttribute('aria-expanded', 'false');
+        toggleButton.setAttribute('aria-controls', extraWrapper.id);
+
+        try {
+            const labelKey = restCount === 1 ? 'preview_toggle_label_singular' : 'preview_toggle_label_plural';
+            const [openLabel, closeLabel] = await Promise.all([
+                getString(labelKey, 'bbbext_bnx', restCount),
+                getString('preview_toggle_label_close', 'bbbext_bnx')
+            ]);
+            toggleButton.dataset.labelOpen = openLabel;
+            toggleButton.dataset.labelClose = closeLabel;
+            toggleButton.setAttribute('aria-label', openLabel);
+            toggleButton.setAttribute('title', openLabel);
+        } catch (error) {
+            // Strings unavailable – continue with default attributes.
+        }
+
+        const thumbnailArray = Array.from(thumbnails);
+        const primaryThumbnail = thumbnailArray[0];
+        primaryThumbnail.dataset.previewIndex = '0';
+
+        const parentRow = primaryThumbnail.closest('.row') ?? container;
+
+        thumbnailArray.slice(1).forEach((thumb, index) => {
+            thumb.dataset.previewIndex = String(index + 1);
+            extraWrapper.appendChild(thumb);
+        });
+
+        parentRow.appendChild(extraWrapper);
+        primaryThumbnail.insertAdjacentElement('afterend', toggleButton);
+
+        const openPreviews = () => {
+            if (!extraWrapper.classList.contains('d-none')) {
+                return;
+            }
+            extraWrapper.classList.remove('d-none');
+            extraWrapper.removeAttribute('hidden');
+            extraWrapper.setAttribute('aria-hidden', 'false');
+            toggleButton.setAttribute('aria-expanded', 'true');
+            if (toggleButton.dataset.labelClose) {
+                toggleButton.setAttribute('aria-label', toggleButton.dataset.labelClose);
+                toggleButton.setAttribute('title', toggleButton.dataset.labelClose);
+            }
+        };
+
+        const closePreviews = () => {
+            if (extraWrapper.classList.contains('d-none')) {
+                return;
+            }
+            extraWrapper.classList.add('d-none');
+            extraWrapper.setAttribute('hidden', '');
+            extraWrapper.setAttribute('aria-hidden', 'true');
+            toggleButton.setAttribute('aria-expanded', 'false');
+            if (toggleButton.dataset.labelOpen) {
+                toggleButton.setAttribute('aria-label', toggleButton.dataset.labelOpen);
+                toggleButton.setAttribute('title', toggleButton.dataset.labelOpen);
+            }
+        };
+
+        toggleButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (extraWrapper.classList.contains('d-none')) {
+                openPreviews();
+            } else {
+                closePreviews();
+            }
+        });
+
+        toggleButton.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closePreviews();
+            }
+        });
+
+        [primaryThumbnail, toggleButton].forEach((element) => {
+            element.addEventListener('mouseenter', openPreviews);
+            element.addEventListener('focus', openPreviews);
+        });
+
+        container.addEventListener('mouseleave', closePreviews);
+        container.addEventListener('focusout', (event) => {
+            if (!container.contains(event.relatedTarget)) {
+                closePreviews();
+            }
+        });
+    });
+};
+
 setupTableInteractions();
 setupPagination();
+initPreviewEnhancements();
