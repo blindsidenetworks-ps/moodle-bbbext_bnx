@@ -26,6 +26,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'BigBlueButton BN Experience';
+$string['preview_toggle_label_close'] = 'Hide additional preview thumbnails';
+$string['preview_toggle_label_plural'] = 'Show {$a} more preview thumbnails';
+$string['preview_toggle_label_singular'] = 'Show one more preview thumbnail';
 $string['privacy:metadata'] = 'The BigBlueButton BN Experience plugin doesn\'t store any personal data.';
 $string['secondarynavlabel'] = 'BigBlueButton +';
 $string['view_recording_search'] = 'Search';

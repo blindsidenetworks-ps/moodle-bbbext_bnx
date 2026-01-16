@@ -48,14 +48,14 @@
     {{#recordings.output}}
         {{#first}}
         <div class="row mb-3 font-weight-bold">
-            <div class="col-md-1">{{#str}}view_recording_playback, mod_bigbluebuttonbn{{/str}}</div>
-            <div class="col-md-1 sortable-header" data-sort="name">{{#str}}view_recording_name, mod_bigbluebuttonbn{{/str}} <span class="sort-icon">▲</span></div>
-            <div class="col-md-2 sortable-header" data-sort="description">{{#str}}view_recording_description, mod_bigbluebuttonbn{{/str}} <span class="sort-icon">▲</span></div>
-            <div class="col-md-1">{{#str}}view_recording_preview, mod_bigbluebuttonbn{{/str}}</div>
-            <div class="col-md-2 sortable-header" data-sort="date">{{#str}}view_recording_date, mod_bigbluebuttonbn{{/str}} <span class="sort-icon">▲</span></div>
-            <div class="col-md-1">{{#str}}view_recording_duration, mod_bigbluebuttonbn{{/str}}</div>
+            <div class="col-md-1 col-lg-1">{{#str}}view_recording_playback, mod_bigbluebuttonbn{{/str}}</div>
+            <div class="col-md-1 col-lg-1 sortable-header" data-sort="name">{{#str}}view_recording_name, mod_bigbluebuttonbn{{/str}} <span class="sort-icon">▲</span></div>
+            <div class="col-md-2 col-lg-2 sortable-header" data-sort="description">{{#str}}view_recording_description, mod_bigbluebuttonbn{{/str}} <span class="sort-icon">▲</span></div>
+            <div class="col-md-1 col-lg-2">{{#str}}view_recording_preview, mod_bigbluebuttonbn{{/str}}</div>
+            <div class="col-md-2 col-lg-2 sortable-header" data-sort="date">{{#str}}view_recording_date, mod_bigbluebuttonbn{{/str}} <span class="sort-icon">▲</span></div>
+            <div class="col-md-1 col-lg-1">{{#str}}view_recording_duration, mod_bigbluebuttonbn{{/str}}</div>
             {{#showactionbar}}
-            <div class="col-md-4">{{#str}}view_recording_actionbar, mod_bigbluebuttonbn{{/str}}</div>
+            <div class="col-md-4 col-lg-3">{{#str}}view_recording_actionbar, mod_bigbluebuttonbn{{/str}}</div>
             {{/showactionbar}}
         </div>
         {{/first}}
@@ -66,20 +66,22 @@
             <div class="col-md-1" data-sort="name">
                 {{{recording}}}
             </div>
-            <div class="col-md-2" data-sort="description">
+            <div class="col-md-2 col-lg-2" data-sort="description">
                 {{{description}}}
             </div>
-            <div class="col-md-1">
-                {{{preview}}}
+            <div class="col-md-1 col-lg-2">
+                <div class="bnx-recording-preview" data-bnx-preview="1">
+                    {{{preview}}}
+                </div>
             </div>
-            <div class="col-md-2" data-sort="date">
+            <div class="col-md-2 col-lg-2" data-sort="date">
                 {{{date}}}
             </div>
             <div class="col-md-1">
                 {{{duration}}}
             </div>
             {{#showactionbar}}
-            <div class="col-md-4">
+            <div class="col-md-4 col-lg-3">
                 {{{actionbar}}}
             </div>
             {{/showactionbar}}
