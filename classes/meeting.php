@@ -31,7 +31,6 @@ use mod_bigbluebuttonbn\recording;
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 class meeting extends \mod_bigbluebuttonbn\meeting {
-
     /**
      * Helper to join a meeting.
      *

@@ -84,7 +84,6 @@ class bigbluebutton_proxy extends \mod_bigbluebuttonbn\local\proxy\bigbluebutton
             }
         }
 
-        /** @var \SimpleXMLElement $xml */
         self::assert_returned_xml($xml);
 
         if (empty($xml->meetingID)) {

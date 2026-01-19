@@ -28,7 +28,6 @@ use mod_bigbluebuttonbn\instance;
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 class get_meeting_info extends \mod_bigbluebuttonbn\external\meeting_info {
-
     /**
      * Fetch meeting information.
      *
