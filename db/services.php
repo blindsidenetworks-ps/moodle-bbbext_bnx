@@ -28,6 +28,15 @@
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
+    'bbbext_bnx_get_meeting_info' => [
+        'classname' => 'bbbext_bnx\\external\\get_meeting_info',
+        'methodname' => 'execute',
+        'description' => 'Get meeting info with BNX extensions.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/bigbluebuttonbn:view',
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
     'bbbext_bnx_get_recordings' => [
         'classname' => 'bbbext_bnx\\external\\get_recordings',
         'methodname' => 'execute',
