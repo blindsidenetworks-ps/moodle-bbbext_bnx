@@ -78,7 +78,9 @@ const poll = () => {
             timerReference = setTimeout(() => poll(), pollInterval * pollIntervalFactor);
             return true;
         })
-        .catch();
+        .catch(() => {
+            // Silently ignore polling errors - the next poll will retry.
+        });
 };
 
 /**
