@@ -49,7 +49,7 @@ export const completionValidate = (bigbluebuttonbnid) => fetchMany([
 
 export const getMeetingInfo = (bigbluebuttonbnid, groupid, updatecache = false) => fetchMany([
     {
-        methodname: 'mod_bigbluebuttonbn_meeting_info',
+        methodname: 'bbbext_bnx_get_meeting_info',
         args: {
             bigbluebuttonbnid,
             groupid,

@@ -108,7 +108,7 @@ class page_context_builder {
             'meetingname' => $this->instance->get_meeting_name(),
             'meetingdescription' => $this->instance->get_meeting_description(true),
             'description' => $this->instance->get_meeting_description(true),
-            'joinurl' => $this->instance->get_join_url(),
+            'joinurl' => \bbbext_bnx\local\helpers\joinurl_helper::build_join_url($this->instance)->out(false),
             'recordings' => (object) [
                 'session' => (object) [],
                 'output' => [],
