@@ -125,13 +125,12 @@ class meeting extends \mod_bigbluebuttonbn\meeting {
     /**
      * Get presentations for webservice consumption from sidecar plugins.
      *
-     * This method checks if bnx_preuploads is available and retrieves presentations from it.
-     *
      * @return array
      */
     protected function get_presentations_for_ws(): array {
         // Check if bnx_preuploads is installed, enabled, and has the helper class.
-        if (!self::is_sidecar_available('bnx_preuploads', '\bbbext_bnx_preuploads\local\helpers\presentation_helper')) {
+        $helperclass = '\bbbext_bnx_preuploads\local\helpers\presentation_helper';
+        if (!local\helpers\sidecar_helper::is_available('bnx_preuploads', $helperclass)) {
             return [];
         }
         return \bbbext_bnx_preuploads\local\helpers\presentation_helper::get_presentations_for_ws(
@@ -146,31 +145,12 @@ class meeting extends \mod_bigbluebuttonbn\meeting {
      */
     protected function get_presentations(): array {
         // Check if bnx_preuploads is installed, enabled, and has the helper class.
-        if (!self::is_sidecar_available('bnx_preuploads', '\bbbext_bnx_preuploads\local\helpers\presentation_helper')) {
+        $helperclass = '\bbbext_bnx_preuploads\local\helpers\presentation_helper';
+        if (!local\helpers\sidecar_helper::is_available('bnx_preuploads', $helperclass)) {
             return [];
         }
         return \bbbext_bnx_preuploads\local\helpers\presentation_helper::get_presentations(
             $this->instance->get_instance_id()
         );
-    }
-
-    /**
-     * Check if a sidecar plugin is installed, enabled, and optionally has a required class.
-     *
-     * @param string $sidecarname The name of the sidecar plugin (e.g., 'bnx_preuploads', 'bnx_insights').
-     * @param string|null $requiredclass Optional fully qualified class name that must exist.
-     * @return bool True if the sidecar is available for use.
-     */
-    protected static function is_sidecar_available(string $sidecarname, ?string $requiredclass = null): bool {
-        // Check if the plugin is enabled via plugin manager.
-        $enabledplugins = \core_plugin_manager::instance()->get_enabled_plugins('bbbext');
-        if (!isset($enabledplugins[$sidecarname])) {
-            return false;
-        }
-        // Optionally check if a specific class exists (plugin properly installed).
-        if ($requiredclass !== null && !class_exists($requiredclass)) {
-            return false;
-        }
-        return true;
     }
 }
