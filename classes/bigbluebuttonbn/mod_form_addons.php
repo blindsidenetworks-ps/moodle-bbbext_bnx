@@ -118,7 +118,15 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
      * @return void
      */
     public function add_fields(): void {
-        // Parent BNX plugin does not expose additional form controls yet.
+        global $PAGE;
+
+        // Inject hidden span with nav label and initialize overridenav JS.
+        $label = get_string('secondarynavlabel', 'bbbext_bnx');
+        $this->mform->addElement(
+            'html',
+            '<span class="bbbext-bnx-navlabel" data-label="' . s($label) . '" hidden></span>'
+        );
+        $PAGE->requires->js_call_amd('bbbext_bnx/overridenav', 'init');
     }
 
     /**
