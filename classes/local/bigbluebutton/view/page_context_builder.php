@@ -45,24 +45,19 @@ class page_context_builder {
     private $instance;
     /** @var renderer_base */
     private $output;
-    /** @var \mod_bigbluebuttonbn\output\renderer */
-    private $modrenderer;
 
     /**
      * Constructor.
      *
      * @param instance $instance BigBlueButton instance being rendered.
      * @param renderer_base $output The renderer used for template exporting.
-     * @param \mod_bigbluebuttonbn\output\renderer $modrenderer Module renderer for group selector output.
      */
     public function __construct(
         instance $instance,
-        renderer_base $output,
-        \mod_bigbluebuttonbn\output\renderer $modrenderer
+        renderer_base $output
     ) {
         $this->instance = $instance;
         $this->output = $output;
-        $this->modrenderer = $modrenderer;
     }
 
     /**
@@ -104,7 +99,7 @@ class page_context_builder {
         return (object) [
             'instanceid' => $this->instance->get_instance_id(),
             'pollinterval' => $pollinterval * 1000,
-            'groupselector' => $this->modrenderer->render_groups_selector($this->instance),
+            'groupselector' => $this->render_groups_selector(),
             'meetingname' => $this->instance->get_meeting_name(),
             'meetingdescription' => $this->instance->get_meeting_description(true),
             'description' => $this->instance->get_meeting_description(true),
@@ -115,6 +110,53 @@ class page_context_builder {
                 'search' => true,
             ],
         ];
+    }
+
+    /**
+     * Render the groups selector with BNX-specific behavior.
+     *
+     * For Separate Groups mode, "All Participants" is hidden for all users
+     * including teachers and admins. For Visible Groups, default behavior applies.
+     *
+     * @return string The rendered groups selector HTML.
+     */
+    private function render_groups_selector(): string {
+        $cm = $this->instance->get_cm();
+        $groupmode = groups_get_activity_groupmode($cm);
+
+        if ($groupmode == NOGROUPS) {
+            return '';
+        }
+
+        // Get allowed groups for the current user.
+        $groups = groups_get_activity_allowed_groups($cm);
+        if (empty($groups)) {
+            \core\notification::add(
+                get_string('view_groups_nogroups_warning', 'bigbluebuttonbn'),
+                \core\output\notification::NOTIFY_INFO
+            );
+            return '';
+        }
+
+        if (count($groups) > 1) {
+            \core\notification::add(
+                get_string('view_groups_selection_warning', 'bigbluebuttonbn'),
+                \core\output\notification::NOTIFY_INFO
+            );
+        }
+
+        // For Separate Groups mode, hide "All Participants" for everyone (including teachers/admins).
+        // For Visible Groups mode, show "All Participants" to everyone.
+        $hideallparticipants = ($groupmode == SEPARATEGROUPS);
+
+        $groupsmenu = groups_print_activity_menu(
+            $cm,
+            $this->instance->get_view_url(),
+            true,
+            $hideallparticipants
+        );
+
+        return $groupsmenu . '<br><br>';
     }
 
     /**

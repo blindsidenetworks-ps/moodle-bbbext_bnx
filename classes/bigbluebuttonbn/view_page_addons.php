@@ -55,10 +55,7 @@ class view_page_addons extends \mod_bigbluebuttonbn\local\extension\view_page_ad
      * @return stdClass
      */
     public function export_for_template(renderer_base $output): stdClass {
-        global $PAGE;
-
-        $modrenderer = $PAGE->get_renderer('mod_bigbluebuttonbn');
-        $builder = new page_context_builder($this->instance, $output, $modrenderer);
+        $builder = new page_context_builder($this->instance, $output);
 
         return $builder->build();
     }
