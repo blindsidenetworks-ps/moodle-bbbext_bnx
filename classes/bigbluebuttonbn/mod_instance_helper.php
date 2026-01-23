@@ -50,12 +50,7 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
      * Mapping between form fields and stored setting names.
      */
     public const FEATURE_FIELD_MAP = [
-        'enablecam' => 'enablecam',
-        'enablemic' => 'enablemic',
-        'enableprivatechat' => 'enableprivatechat',
-        'enablepublicchat' => 'enablepublicchat',
-        'enableuserlist' => 'enableuserlist',
-        'enablenote' => 'enablenotes',
+        'approvalbeforejoin' => 'approvalbeforejoin',
     ];
 
     /**

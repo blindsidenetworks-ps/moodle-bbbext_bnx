@@ -25,6 +25,7 @@
 
 namespace bbbext_bnx\bigbluebuttonbn;
 
+use bbbext_bnx\local\helpers\mod_form_helper;
 use bbbext_bnx\local\services\bnx_settings_service;
 use bbbext_bnx\local\services\bnx_settings_service_interface;
 use stdClass;
@@ -89,7 +90,7 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
             return;
         }
 
-        $bnxid = $this->get_bnx_id((int)$defaultvalues['id']);
+        $bnxid = mod_form_helper::get_bnx_id((int)$defaultvalues['id']);
         if ($bnxid === null) {
             return;
         }
@@ -119,6 +120,20 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
      */
     public function add_fields(): void {
         // A nav label override is handled globally via hook_callbacks::before_footer().
+
+        // Check if the feature is editable.
+        $editable = mod_form_helper::is_feature_editable('approvalbeforejoin');
+        if (!$editable) {
+            return;
+        }
+        // Add the approval before join checkbox.
+        mod_form_helper::add_approval_before_join_checkbox(
+            $this->mform,
+            mod_form_helper::get_feature_default('approvalbeforejoin')
+        );
+
+        // Remove the wait room setting as it's replaced by approval before join.
+        mod_form_helper::remove_element($this->mform, 'wait');
     }
 
     /**
@@ -145,18 +160,5 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
         unset($files);
 
         return $errors;
-    }
-
-    /**
-     * Resolve the bnx identifier for a module.
-     *
-     * @param int $moduleid module identifier
-     * @return int|null
-     */
-    private function get_bnx_id(int $moduleid): ?int {
-        global $DB;
-
-        $record = $DB->get_record('bbbext_bnx', ['bigbluebuttonbnid' => $moduleid], 'id');
-        return $record ? (int)$record->id : null;
     }
 }

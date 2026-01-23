@@ -57,22 +57,18 @@ final class mod_instance_helper_test extends \advanced_testcase {
         $module = $this->create_bigbluebutton_activity();
         $bnxid = $this->ensure_bnx_record($module->id);
 
-        $configplugin = 'bbbext_bnx_locksettings';
-        set_config('cam_editable', 1, $configplugin);
-        set_config('mic_editable', 1, $configplugin);
+        set_config('approvalbeforejoin_editable', 1, 'bbbext_bnx');
 
         $helper = new mod_instance_helper();
         $helper->add_instance((object) [
             'id' => $module->id,
-            'enablecam' => 1,
-            'enablemic' => 0,
+            'approvalbeforejoin' => 1,
         ]);
 
         $service = bnx_settings_service::get_service();
         $settings = $service->get_settings($bnxid);
 
-        $this->assertSame('1', $settings['enablecam']);
-        $this->assertSame('0', $settings['enablemic']);
+        $this->assertSame('1', $settings['approvalbeforejoin']);
     }
 
     /**
@@ -86,14 +82,14 @@ final class mod_instance_helper_test extends \advanced_testcase {
 
         $bnxid = $this->ensure_bnx_record($module->id);
         $service = bnx_settings_service::get_service();
-        $service->set_settings($bnxid, ['enablecam' => 0]);
+        $service->set_settings($bnxid, ['approvalbeforejoin' => 0]);
 
         $helper->update_instance((object) [
             'id' => $module->id,
-            'enablecam' => 1,
+            'approvalbeforejoin' => 1,
         ]);
 
-        $this->assertSame('1', $service->get_setting($bnxid, 'enablecam'));
+        $this->assertSame('1', $service->get_setting($bnxid, 'approvalbeforejoin'));
     }
 
     /**

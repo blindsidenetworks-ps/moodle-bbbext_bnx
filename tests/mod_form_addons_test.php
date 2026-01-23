@@ -64,12 +64,12 @@ final class mod_form_addons_test extends \advanced_testcase {
         $bnxid = $this->ensure_bnx_record($module->id);
 
         $service = bnx_settings_service::get_service();
-        $service->set_settings($bnxid, ['enablecam' => 1]);
+        $service->set_settings($bnxid, ['approvalbeforejoin' => 1]);
 
         $defaults = ['id' => $module->id];
         $addons->data_preprocessing($defaults);
 
-        $this->assertSame(1, $defaults['enablecam']);
+        $this->assertSame(1, $defaults['approvalbeforejoin']);
     }
 
     /**
