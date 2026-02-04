@@ -25,13 +25,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['approvalbeforejoin'] = 'Moderator approval required to join session';
+$string['approvalbeforejoin'] = 'Moderator approval required to join session +';
 $string['approvalbeforejoin_default'] = 'Default moderator approval state';
 $string['approvalbeforejoin_default_desc'] = 'If enabled, participants will require moderator approval before joining by default.';
 $string['approvalbeforejoin_editable'] = 'Allow users to change the default setting for moderator approval before session join';
 $string['approvalbeforejoin_editable_desc'] = 'If enabled, teachers can override the default moderator approval behaviour in activity settings.';
 $string['approvalbeforejoin_help'] = 'If enabled, participants must be approved by a moderator before joining the session.';
-$string['mod_form_bnxroom'] = 'Room Settings +';
+$string['mod_form_block_room'] = 'Room Settings +';
 $string['navlabel'] = 'BigBlueButton +';
 $string['options_disabled'] = 'Disabled';
 $string['options_enabled'] = 'Enabled';
@@ -42,3 +42,4 @@ $string['preview_toggle_label_singular'] = 'Show one more preview thumbnail';
 $string['privacy:metadata'] = 'The BigBlueButton BN Experience plugin doesn\'t store any personal data.';
 $string['view_recording_search'] = 'Search';
 $string['view_recording_search_placeholder'] = 'Search for recordings';
+$string['view_section_title_presentation'] = 'Presentation files +';

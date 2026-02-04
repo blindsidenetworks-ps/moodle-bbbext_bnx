@@ -121,6 +121,13 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
     public function add_fields(): void {
         // A nav label override is handled globally via hook_callbacks::before_footer().
 
+        // Override the core Room block header with the BNX-specific label.
+        mod_form_helper::rename_header(
+            $this->mform,
+            'room',
+            get_string('mod_form_block_room', 'bbbext_bnx')
+        );
+
         // Check if the feature is editable.
         $editable = mod_form_helper::is_feature_editable('approvalbeforejoin');
         if (!$editable) {
