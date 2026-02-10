@@ -233,7 +233,21 @@ class page_context_builder {
         $roomdata->haspresentations = !empty($roomdata->presentations);
         $roomdata->showpresentations = $this->instance->should_show_presentation();
 
+        // Allow sidecars to adjust room data.
+        $roomdata = $this->apply_sidecar_room_adjustments($roomdata);
+
         $context->room = $roomdata;
+    }
+
+    /**
+     * Allow sidecar plugins to adjust room data.
+     *
+     *
+     * @param stdClass $roomdata The room data to adjust.
+     * @return stdClass The adjusted room data.
+     */
+    private function apply_sidecar_room_adjustments(stdClass $roomdata): stdClass {
+        return \bbbext_bnx\local\helpers\sidecar_helper::apply_room_adjustments($this->instance, $roomdata);
     }
 
     /**

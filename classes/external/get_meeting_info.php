@@ -67,6 +67,15 @@ class get_meeting_info extends \mod_bigbluebuttonbn\external\meeting_info {
         if (array_key_exists('guestpassword', $meetinginfo)) {
             $result['guestpassword'] = $meetinginfo['guestpassword'];
         }
+        if (array_key_exists('statusmessage', $meetinginfo)) {
+            $result['statusmessage'] = $meetinginfo['statusmessage'];
+        }
+        if (array_key_exists('canjoin', $meetinginfo)) {
+            $result['canjoin'] = $meetinginfo['canjoin'];
+        }
+        if (array_key_exists('statusrunning', $meetinginfo)) {
+            $result['statusrunning'] = $meetinginfo['statusrunning'];
+        }
 
         return $result;
     }

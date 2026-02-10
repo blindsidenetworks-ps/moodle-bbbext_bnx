@@ -118,6 +118,8 @@ class meeting extends \mod_bigbluebuttonbn\meeting {
             $meetinginfo->presentations = $presentations;
             $meetinginfo->showpresentations = $this->instance->should_show_presentation();
         }
+        // Apply room adjustments from sidecars.
+        $meetinginfo = local\helpers\sidecar_helper::apply_room_adjustments($this->instance, $meetinginfo);
 
         return $meetinginfo;
     }
