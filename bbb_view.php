@@ -64,45 +64,17 @@ $context = $instance->get_context();
 
 require_login($course, true, $cm);
 
-// Determine group based on actual membership, not session preference.
-// This ensures users in the same group join the same meeting instance for guest lobby to work.
-$groupid = null;
-$groupmode = groups_get_activity_groupmode($cm);
+// Note: this uses the group optional_param as a value to decide which groupid.
+$groupid = groups_get_activity_group($cm, true) ?: null;
 
-if ($groupmode != NOGROUPS) {
-    $context = context_module::instance($cm->id);
-
-    // For users with accessallgroups (e.g., teachers/moderators), check URL parameter first.
-    if (has_capability('moodle/site:accessallgroups', $context)) {
-        // Allow explicit group selection via URL parameter.
-        $explicitgroup = optional_param('group', -1, PARAM_INT);
-        if ($explicitgroup > 0) {
-            // Validate the group exists and is allowed for this activity.
-            $allowedgroups = groups_get_all_groups($cm->course, 0, $cm->groupingid);
-            if (array_key_exists($explicitgroup, $allowedgroups)) {
-                $groupid = $explicitgroup;
-            }
-        }
-
-        // If no explicit group specified, use moderator's actual group membership.
-        if ($groupid === null) {
-            $usergroups = groups_get_all_groups($cm->course, $USER->id, $cm->groupingid);
-            if (!empty($usergroups)) {
-                // Use the first group the moderator is actually a member of.
-                $firstgroup = reset($usergroups);
-                $groupid = $firstgroup->id;
-            }
-        }
-    } else {
-        // Students: use their actual group membership (no session preference).
-        $usergroups = groups_get_all_groups($cm->course, $USER->id, $cm->groupingid);
-        if (!empty($usergroups)) {
-            // In SEPARATEGROUPS, users only access groups they're members of.
-            $firstgroup = reset($usergroups);
-            $groupid = $firstgroup->id;
-        } else if ($groupmode == SEPARATEGROUPS) {
-            // User not in any group in SEPARATEGROUPS mode.
-            $groupid = 0;
+// Override group 0 for teachers/moderators - use first actual group instead.
+// This ensures teachers join the same group as their students by default for guest lobby.
+if ($groupid === 0 && has_capability('moodle/site:accessallgroups', context_module::instance($cm->id))) {
+    $allowedgroups = groups_get_all_groups($cm->course, 0, $cm->groupingid);
+    foreach ($allowedgroups as $group) {
+        if ($group->id > 0) {
+            $groupid = $group->id;
+            break;
         }
     }
 }
