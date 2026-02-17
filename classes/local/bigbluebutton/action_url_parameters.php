@@ -74,9 +74,9 @@ class action_url_parameters {
         if (get_config('bbbext_bnx', 'approvalbeforejoin_editable')) {
             $service = bnx_settings_service::get_service();
             $value = $service->get_setting_for_module($instanceid, 'approvalbeforejoin');
-            return $value;
+            return (bool) $value;
         }
         $default = get_config('bbbext_bnx', 'approvalbeforejoin_default');
-        return $default;
+        return (bool) $default;
     }
 }
