@@ -15,19 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for BigBlueButton BN Experience
+ * Event observers for BN Experience extension.
  *
- * @package   bbbext_bnx
- * @copyright 2025 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ * @package    bbbext_bnx
+ * @category   event
+ * @copyright  2026 onwards, Blindside Networks Inc
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author     Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component    = 'bbbext_bnx';
-$plugin->release      = '0.1.0-alpha.3';
-$plugin->version      = 2026022000;
-$plugin->requires     = 2025100600; // Moodle 5.1.0 minimum.
-$plugin->supported    = [501, 502];
-$plugin->maturity     = MATURITY_ALPHA;
+$observers = [
+    [
+        'eventname' => '\\core\\event\\config_log_created',
+        'callback' => '\\bbbext_bnx\\observer::config_log_created',
+    ],
+];

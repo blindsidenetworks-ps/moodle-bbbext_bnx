@@ -24,6 +24,7 @@
  */
 
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\local\exceptions\server_not_available_exception;
 use mod_bigbluebuttonbn\local\proxy\bigbluebutton_proxy;
 use mod_bigbluebuttonbn\logger;
@@ -110,6 +111,16 @@ switch (strtolower($action)) {
             redirect($url);
         } catch (server_not_available_exception $e) {
             bigbluebutton_proxy::handle_server_not_available($instance);
+        } catch (bigbluebutton_exception $e) {
+            $identifier = trim((string)$e->getMessage());
+            if ($identifier !== '') {
+                $message = $identifier;
+            } else {
+                $message = get_string('error');
+            }
+
+            \core\notification::error($message);
+            redirect($instance->get_view_url());
         }
         // We should never reach this point.
         break;
