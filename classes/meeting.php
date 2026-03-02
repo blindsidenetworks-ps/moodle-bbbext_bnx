@@ -18,6 +18,7 @@ namespace bbbext_bnx;
 
 use stdClass;
 use mod_bigbluebuttonbn\instance;
+use mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception;
 use mod_bigbluebuttonbn\recording;
 
 /**
@@ -42,12 +43,27 @@ class meeting extends \mod_bigbluebuttonbn\meeting {
      * @throws meeting_join_exception this is sent if we cannot join (meeting full, user needs to wait...)
      */
     public static function join_meeting(instance $instance, $origin = logger::ORIGIN_BASE): string {
-        // See if the session is in progress.
         $meeting = new meeting($instance);
-        // As the meeting doesn't exist, try to create it.
-        if (empty($meeting->get_meeting_info(true)->createtime)) {
-            $meeting->create_meeting();
+
+        // Force-fetch meeting info from BBB (bypass cached meetinginfo property).
+        $meeting->update_cache();
+
+        if (empty($meeting->get_meeting_info()->createtime)) {
+            try {
+                $meeting->create_meeting();
+            } catch (bigbluebutton_exception $e) {
+                // The create request may have been processed by BBB even though
+                // the response was malformed (e.g. proxied through a gateway).
+                // Refresh meeting info and proceed if the meeting now exists.
+                $meeting->update_cache();
+                if (empty($meeting->get_meeting_info()->createtime)) {
+                    throw $e;
+                }
+            }
+            // Refresh cached info so join() sees the new createtime.
+            $meeting->update_cache();
         }
+
         return $meeting->join($origin);
     }
 
