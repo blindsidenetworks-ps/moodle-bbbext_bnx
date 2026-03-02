@@ -26,10 +26,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['approvalbeforejoin'] = 'Moderator approval required to join session +';
-$string['approvalbeforejoin_default'] = 'Default moderator approval state';
-$string['approvalbeforejoin_default_desc'] = 'If enabled, participants will require moderator approval before joining by default.';
-$string['approvalbeforejoin_editable'] = 'Allow users to change the default setting for moderator approval before session join';
-$string['approvalbeforejoin_editable_desc'] = 'If enabled, teachers can override the default moderator approval behaviour in activity settings.';
+$string['approvalbeforejoin_default'] = 'Waiting Room enabled by default';
+$string['approvalbeforejoin_default_desc'] = 'When enabled, participants must wait for moderator approval before joining a session by default.';
+$string['approvalbeforejoin_editable'] = 'Allow teachers to change the Waiting Room setting per activity';
+$string['approvalbeforejoin_editable_desc'] = 'When enabled, teachers can turn the Waiting Room on or off for individual activities.';
 $string['approvalbeforejoin_help'] = 'If enabled, participants must be approved by a moderator before joining the session.';
 $string['mod_form_block_room'] = 'Room Settings +';
 $string['navlabel'] = 'BigBlueButton +';
@@ -40,6 +40,8 @@ $string['preview_toggle_label_close'] = 'Hide additional preview thumbnails';
 $string['preview_toggle_label_plural'] = 'Show {$a} more preview thumbnails';
 $string['preview_toggle_label_singular'] = 'Show one more preview thumbnail';
 $string['privacy:metadata'] = 'The BigBlueButton BN Experience plugin doesn\'t store any personal data.';
+$string['section_waitingroom_desc'] = 'Require moderator approval before participants can join a session.';
+$string['section_waitingroom_heading'] = 'Waiting Room';
 $string['view_recording_search'] = 'Search';
 $string['view_recording_search_placeholder'] = 'Search for recordings';
 $string['view_section_title_presentation'] = 'Presentation files +';
