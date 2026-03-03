@@ -31,5 +31,37 @@
                 <KEY NAME="bnx_setting_unique" TYPE="unique" FIELDS="bnxid, name"/>
             </KEYS>
         </TABLE>
+        <TABLE NAME="bbbext_bnx_reminders" COMMENT="Stores individual reminder timespans for a BigBlueButton instance">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="bigbluebuttonbnid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="timespan" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Reminder timespan before meeting starts in ISO 8601 format"/>
+                <FIELD NAME="lastsent" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="fk_bigbluebuttonbnid" TYPE="foreign" FIELDS="bigbluebuttonbnid" REFTABLE="bigbluebuttonbn" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="bbbext_bnx_reminders_guests" COMMENT="Stores guest email addresses to receive reminders">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="bigbluebuttonbnid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="email" TYPE="char" LENGTH="254" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="userfrom" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="issent" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="isenabled" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="1" SEQUENCE="false"/>
+                <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="bigbluebuttonbnid_fk" TYPE="foreign" FIELDS="bigbluebuttonbnid" REFTABLE="bigbluebuttonbn" REFFIELDS="id"/>
+                <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+                <KEY NAME="userfrom" TYPE="foreign" FIELDS="userfrom" REFTABLE="user" REFFIELDS="id"/>
+                <KEY NAME="bbbemail_ux" TYPE="unique" FIELDS="email, bigbluebuttonbnid, userfrom"/>
+            </KEYS>
+        </TABLE>
     </TABLES>
 </XMLDB>

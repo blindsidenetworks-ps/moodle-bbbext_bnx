@@ -16,6 +16,8 @@
 
 namespace bbbext_bnx\local\helpers;
 
+use bbbext_bnx\reminders_utils;
+
 /**
  * Helper class for mod_form functionality.
  *
@@ -130,5 +132,70 @@ class mod_form_helper {
 
         $record = $DB->get_record('bbbext_bnx', ['bigbluebuttonbnid' => $moduleid], 'id');
         return $record ? (int)$record->id : null;
+    }
+
+    /**
+     * Add the reminder form fields to the activity form.
+     *
+     * @param \MoodleQuickForm $mform The form instance
+     * @param \stdClass|null $bigbluebuttonbndata Existing module data
+     * @return void
+     */
+    public static function add_reminder_fields(\MoodleQuickForm &$mform, ?\stdClass $bigbluebuttonbndata = null): void {
+        global $DB;
+
+        $mform->addElement('header', 'bnx_reminders', get_string('mod_form_reminders', 'bbbext_bnx'));
+        $mform->addElement('static', 'bnx_reminders_desc', '', get_string('mod_form_reminders_desc', 'bbbext_bnx'));
+
+        $mform->addElement(
+            'advcheckbox',
+            'bnx_reminderenabled',
+            get_string('reminders:enabled', 'bbbext_bnx'),
+        );
+        $mform->addHelpButton('bnx_reminderenabled', 'reminders', 'bbbext_bnx');
+        $mform->setDefault('bnx_reminderenabled', self::get_feature_default('reminder'));
+        $mform->setType('bnx_reminderenabled', PARAM_BOOL);
+
+        $mform->addElement(
+            'advcheckbox',
+            'bnx_remindertoguestsenabled',
+            get_string('reminders:guestenabled', 'bbbext_bnx')
+        );
+        $mform->setDefault('bnx_remindertoguestsenabled', 0);
+        $mform->setType('bnx_remindertoguestsenabled', PARAM_BOOL);
+        $mform->hideIf('bnx_remindertoguestsenabled', 'bnx_reminderenabled', 'eq', 0);
+
+        // Determine how many timespans to show.
+        $existingtimespans = [];
+        if (!empty($bigbluebuttonbndata->id)) {
+            $existingtimespans = $DB->get_records(
+                'bbbext_bnx_reminders',
+                ['bigbluebuttonbnid' => $bigbluebuttonbndata->id]
+            );
+        }
+        $paramcount = max(1, count($existingtimespans));
+
+        $mform->addElement('hidden', 'bnx_paramcount', $paramcount);
+        $mform->setType('bnx_paramcount', PARAM_INT);
+
+        $timespanoptions = reminders_utils::get_timespan_options();
+        $existingtimespanvalues = array_values(array_map(fn($r) => $r->timespan, $existingtimespans));
+
+        for ($i = 0; $i < $paramcount; $i++) {
+            $group = [];
+            $group[] = $mform->createElement('select', "bnx_timespan[$i]", '', $timespanoptions);
+            $group[] = $mform->createElement(
+                'static',
+                "bnx_timespanlabel[$i]",
+                '',
+                get_string('reminder:message', 'bbbext_bnx')
+            );
+            $mform->addGroup($group, "bnx_timespangroup[$i]", get_string('timespan:bell', 'bbbext_bnx'), ' ', false);
+            $mform->hideIf("bnx_timespangroup[$i]", 'bnx_reminderenabled', 'eq', 0);
+
+            if (isset($existingtimespanvalues[$i])) {
+                $mform->setDefault("bnx_timespan[$i]", $existingtimespanvalues[$i]);
+            }
+        }
     }
 }

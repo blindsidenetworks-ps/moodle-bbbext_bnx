@@ -14,20 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace bbbext_bnx\output;
+
+use plugin_renderer_base;
+
 /**
- * Version information for BigBlueButton BN Experience
+ * Renderer for bbbext_bnx.
  *
  * @package   bbbext_bnx
  * @copyright 2025 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component    = 'bbbext_bnx';
-$plugin->release      = '0.1.0-alpha.4';
-$plugin->version      = 2026030300;
-$plugin->requires     = 2025100600; // Moodle 5.1.0 minimum.
-$plugin->supported    = [501, 502];
-$plugin->maturity     = MATURITY_ALPHA;
+class renderer extends plugin_renderer_base {
+    /**
+     * Render the subscriptions page.
+     *
+     * @param subscriptions $subscriptions
+     * @return string
+     */
+    protected function render_subscriptions(subscriptions $subscriptions): string {
+        $data = $subscriptions->export_for_template($this);
+        return $this->render_from_template('bbbext_bnx/subscriptions', $data);
+    }
+}
