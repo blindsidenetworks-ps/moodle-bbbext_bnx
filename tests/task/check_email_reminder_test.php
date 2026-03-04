@@ -127,12 +127,14 @@ final class check_email_reminder_test extends \advanced_testcase {
 
         for ($i = 1; $i < 4; $i++) {
             $this->students[] = $generator->create_and_enrol(
-                $course, 'student',
+                $course,
+                'student',
                 ['email' => 'username' . $i . '@example.com', 'username' => 'username' . $i]
             );
         }
         $this->teacher = $generator->create_and_enrol(
-            $course, 'teacher',
+            $course,
+            'teacher',
             ['email' => 'teacher@example.com', 'username' => 'teacher']
         );
     }
@@ -166,8 +168,12 @@ final class check_email_reminder_test extends \advanced_testcase {
         ]);
         $time = new DateTime('now', core_date::get_user_timezone_object());
         $time->add(new DateInterval($openingtimespan));
-        $DB->set_field('bigbluebuttonbn', 'openingtime', $time->getTimestamp(),
-            ['id' => $this->bbbinstance->get_instance_id()]);
+        $DB->set_field(
+            'bigbluebuttonbn',
+            'openingtime',
+            $time->getTimestamp(),
+            ['id' => $this->bbbinstance->get_instance_id()]
+        );
 
         foreach ($this->students as $student) {
             if (in_array($student->email, $nosubscriptions)) {
@@ -223,8 +229,12 @@ final class check_email_reminder_test extends \advanced_testcase {
         ]);
         $time = new DateTime('now', core_date::get_user_timezone_object());
         $time->add(new DateInterval($openingtimespan));
-        $DB->set_field('bigbluebuttonbn', 'openingtime', $time->getTimestamp(),
-            ['id' => $this->bbbinstance->get_instance_id()]);
+        $DB->set_field(
+            'bigbluebuttonbn',
+            'openingtime',
+            $time->getTimestamp(),
+            ['id' => $this->bbbinstance->get_instance_id()]
+        );
 
         foreach ($this->students as $student) {
             if (in_array($student->email, $nosubscriptions)) {
@@ -266,8 +276,12 @@ final class check_email_reminder_test extends \advanced_testcase {
         ]);
         $time = new DateTime('now', core_date::get_user_timezone_object());
         $time->add(new DateInterval('PT1H'));
-        $DB->set_field('bigbluebuttonbn', 'openingtime', $time->getTimestamp(),
-            ['id' => $this->bbbinstance->get_instance_id()]);
+        $DB->set_field(
+            'bigbluebuttonbn',
+            'openingtime',
+            $time->getTimestamp(),
+            ['id' => $this->bbbinstance->get_instance_id()]
+        );
 
         // Disable the plugin.
         set_config('enabled', 0, 'bbbext_bnx');

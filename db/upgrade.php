@@ -78,10 +78,12 @@ function xmldb_bbbext_bnx_upgrade($oldversion) {
                 }
                 $now = time();
                 foreach (['reminderenabled', 'remindertoguestsenabled'] as $settingname) {
-                    if (!$DB->record_exists('bbbext_bnx_settings', [
-                        'bnxid' => $bnxrecord->id,
-                        'name' => $settingname,
-                    ])) {
+                    if (
+                        !$DB->record_exists('bbbext_bnx_settings', [
+                            'bnxid' => $bnxrecord->id,
+                            'name' => $settingname,
+                        ])
+                    ) {
                         $DB->insert_record('bbbext_bnx_settings', (object) [
                             'bnxid' => $bnxrecord->id,
                             'name' => $settingname,
@@ -98,10 +100,12 @@ function xmldb_bbbext_bnx_upgrade($oldversion) {
             $records = $DB->get_records('bbbext_bnreminders_rem');
             foreach ($records as $record) {
                 unset($record->id);
-                if (!$DB->record_exists('bbbext_bnx_reminders', [
-                    'bigbluebuttonbnid' => $record->bigbluebuttonbnid,
-                    'timespan' => $record->timespan,
-                ])) {
+                if (
+                    !$DB->record_exists('bbbext_bnx_reminders', [
+                        'bigbluebuttonbnid' => $record->bigbluebuttonbnid,
+                        'timespan' => $record->timespan,
+                    ])
+                ) {
                     $DB->insert_record('bbbext_bnx_reminders', $record);
                 }
             }
@@ -111,11 +115,13 @@ function xmldb_bbbext_bnx_upgrade($oldversion) {
             $records = $DB->get_records('bbbext_bnreminders_guests');
             foreach ($records as $record) {
                 unset($record->id);
-                if (!$DB->record_exists('bbbext_bnx_reminders_guests', [
-                    'email' => $record->email,
-                    'bigbluebuttonbnid' => $record->bigbluebuttonbnid,
-                    'userfrom' => $record->userfrom,
-                ])) {
+                if (
+                    !$DB->record_exists('bbbext_bnx_reminders_guests', [
+                        'email' => $record->email,
+                        'bigbluebuttonbnid' => $record->bigbluebuttonbnid,
+                        'userfrom' => $record->userfrom,
+                    ])
+                ) {
                     $DB->insert_record('bbbext_bnx_reminders_guests', $record);
                 }
             }

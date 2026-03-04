@@ -39,8 +39,12 @@ class unsubscribe extends moodleform {
         $mform = $this->_form;
         $customdata = $this->_customdata;
 
-        $mform->addElement('static', 'message', '',
-            get_string('unsubscribe:label', 'bbbext_bnx'));
+        $mform->addElement(
+            'static',
+            'message',
+            '',
+            get_string('unsubscribe:label', 'bbbext_bnx')
+        );
 
         $mform->addElement('hidden', 'cmid', $customdata['cmid']);
         $mform->setType('cmid', PARAM_INT);
