@@ -151,8 +151,6 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
      *
      * @param stdClass $data module data payload
      * @return void
-      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private function sync_reminder_data(stdClass $data): void {
         global $DB;

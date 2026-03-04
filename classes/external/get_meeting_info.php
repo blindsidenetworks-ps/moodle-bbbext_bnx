@@ -37,8 +37,6 @@ class get_meeting_info extends \mod_bigbluebuttonbn\external\meeting_info {
      * @return array
      * @throws \moodle_exception
      * @throws restricted_context_exception
-      * @SuppressWarnings(PHPMD.NPathComplexity)
-      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public static function execute(
         int $bigbluebuttonbnid,

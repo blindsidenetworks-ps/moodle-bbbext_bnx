@@ -27,9 +27,6 @@
  *
  * @param int $oldversion
  * @return bool
- * @SuppressWarnings(PHPMD.CyclomaticComplexity)
- * @SuppressWarnings(PHPMD.NPathComplexity)
- * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
  */
 function xmldb_bbbext_bnx_upgrade($oldversion) {
     global $DB;
