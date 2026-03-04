@@ -78,7 +78,8 @@ class mod_form_helper {
         if (!$mform->elementExists($name)) {
             return;
         }
-        for ($i = 0; $i < count($elements); $i++) {
+        $elementcount = count($elements);
+        for ($i = 0; $i < $elementcount; $i++) {
             $mform->insertElementBefore(
                 $elements[$i],
                 $name
@@ -179,7 +180,7 @@ class mod_form_helper {
         $mform->setType('bnx_paramcount', PARAM_INT);
 
         $timespanoptions = reminders_utils::get_timespan_options();
-        $existingtimespanvalues = array_values(array_map(fn($r) => $r->timespan, $existingtimespans));
+        $timespanvalues = array_values(array_map(fn($r) => $r->timespan, $existingtimespans));
 
         for ($i = 0; $i < $paramcount; $i++) {
             $group = [];
@@ -193,8 +194,8 @@ class mod_form_helper {
             $mform->addGroup($group, "bnx_timespangroup[$i]", get_string('timespan:bell', 'bbbext_bnx'), ' ', false);
             $mform->hideIf("bnx_timespangroup[$i]", 'bnx_reminderenabled', 'eq', 0);
 
-            if (isset($existingtimespanvalues[$i])) {
-                $mform->setDefault("bnx_timespan[$i]", $existingtimespanvalues[$i]);
+            if (isset($timespanvalues[$i])) {
+                $mform->setDefault("bnx_timespan[$i]", $timespanvalues[$i]);
             }
         }
     }

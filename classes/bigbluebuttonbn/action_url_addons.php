@@ -36,6 +36,8 @@ class action_url_addons extends \mod_bigbluebuttonbn\local\extension\action_url_
      * 'metadata' keys)
      */
     public function execute(string $action = '', array $data = [], array $metadata = [], ?int $instanceid = null): array {
+        unset($data, $metadata);
+
         // Per extension contract: return ONLY the parameters this addon adds, not the full input.
         // This prevents later addons from overwriting our additions when core merges results.
         if (!$instanceid) {

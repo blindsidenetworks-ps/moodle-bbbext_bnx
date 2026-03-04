@@ -59,6 +59,7 @@ class recording extends base_recording {
      * @param array $excludedid Instance ids excluded from results
      * @param bool $viewdeleted Include deleted recordings flag
      * @return recording[]
+      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public static function get_recordings(instance $instance, array $excludedid = [], bool $viewdeleted = false): array {
         if ($instance->is_feature_enabled('showroom')) {
@@ -96,6 +97,7 @@ class recording extends base_recording {
      * @param bool $onlyimported Restrict to imported recordings
      * @param bool $filterbygroups Restrict results by group membership
      * @return recording[]
+      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public static function get_recordings_for_instance(
         instance $instance,
@@ -140,6 +142,7 @@ class recording extends base_recording {
      * @param bool $includedeleted
      * @param bool $onlydeleted
      * @return recording[]
+      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public static function get_recordings_for_course(
         int $courseid,
@@ -191,6 +194,7 @@ class recording extends base_recording {
      * @param array $selects
      * @param array $params
      * @return recording[]
+      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected static function fetch_records(array $selects, array $params): array {
         global $DB, $CFG;
@@ -295,6 +299,7 @@ class recording extends base_recording {
      * @param int $groupid
      * @param int $groupingid
      * @return array
+      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected static function get_select_for_group($groupmode, $context, $courseid, $groupid = 0, $groupingid = 0): array {
         global $DB, $USER;

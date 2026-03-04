@@ -87,8 +87,6 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
      * @return void
      */
     public function data_preprocessing(?array &$defaultvalues): void {
-        global $DB;
-
         if (empty($defaultvalues['id'])) {
             return;
         }

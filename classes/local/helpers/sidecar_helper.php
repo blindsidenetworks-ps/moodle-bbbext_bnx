@@ -86,7 +86,7 @@ class sidecar_helper {
     private static function get_sorted_bnx_plugins(?string $requiredclass = null): array {
         $enabledplugins = self::get_enabled_plugins();
         $result = [];
-        foreach ($enabledplugins as $name => $path) {
+        foreach (array_keys($enabledplugins) as $name) {
             // Only sort bnx plugins.
             if (!str_starts_with($name, 'bnx')) {
                 continue;
