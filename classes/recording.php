@@ -48,19 +48,11 @@ class recording extends base_recording {
      *
      * @param instance $instance
      * @param string[] $excludedid
-     * @param bool $viewdeleted view deleted recordings?
+     * @param int|bool $viewdeleted view deleted recordings?
      * @return recording[]
      */
-    // phpcs:ignore moodle.Commenting.DocblockTagSniff.InvalidTag
-    /**
-     * Retrieve recordings for a specific instance or its course scope.
-     *
-     * @param instance $instance BigBlueButton instance
-     * @param array $excludedid Instance ids excluded from results
-     * @param bool $viewdeleted Include deleted recordings flag
-     * @return recording[]
-     */
-    public static function get_recordings(instance $instance, array $excludedid = [], bool $viewdeleted = false): array {
+    public static function get_recordings(instance $instance, array $excludedid = [], $viewdeleted = 0): array {
+        $viewdeleted = (bool) $viewdeleted;
         if ($instance->is_feature_enabled('showroom')) {
             return self::get_recordings_for_instance(
                 $instance,
@@ -82,27 +74,20 @@ class recording extends base_recording {
      * Helper function to retrieve recordings from the BigBlueButton.
      *
      * @param instance $instance
-     * @param bool $includeimported
-     * @param bool $onlyimported
-     * @param bool $filterbygroups
-     * @return recording[]
-     */
-    // phpcs:ignore moodle.Commenting.DocblockTagSniff.InvalidTag
-    /**
-     * Retrieve recordings belonging to a single activity instance.
-     *
-     * @param instance $instance BigBlueButton instance
-     * @param bool $includeimported Include imported recordings flag
-     * @param bool $onlyimported Restrict to imported recordings
-     * @param bool $filterbygroups Restrict results by group membership
+     * @param int|bool $includeimported
+     * @param int|bool $onlyimported
+     * @param int|bool $filterbygroups
      * @return recording[]
      */
     public static function get_recordings_for_instance(
         instance $instance,
-        bool $includeimported = false,
-        bool $onlyimported = false,
-        bool $filterbygroups = true
+        $includeimported = 0,
+        $onlyimported = 0,
+        $filterbygroups = 1
     ): array {
+        $includeimported = (bool) $includeimported;
+        $onlyimported = (bool) $onlyimported;
+        $filterbygroups = (bool) $filterbygroups;
         [$selects, $params] = static::get_basic_select_from_parameters(false, $includeimported, $onlyimported);
         $selects[] = "bigbluebuttonbnid = :bbbid";
         $params['bbbid'] = $instance->get_instance_id();
@@ -135,21 +120,26 @@ class recording extends base_recording {
      *
      * @param int $courseid id for a course record or null
      * @param array $excludedinstanceid exclude recordings from instance ids
-     * @param bool $includeimported
-     * @param bool $onlyimported
-     * @param bool $includedeleted
-     * @param bool $onlydeleted
+     * @param int|bool $includeimported
+     * @param int|bool $onlyimported
+     * @param int|bool $includedeleted
+     * @param int|bool $onlydeleted
      * @return recording[]
      */
     public static function get_recordings_for_course(
         int $courseid,
         array $excludedinstanceid = [],
-        bool $includeimported = false,
-        bool $onlyimported = false,
-        bool $includedeleted = false,
-        bool $onlydeleted = false
+        $includeimported = 0,
+        $onlyimported = 0,
+        $includedeleted = 0,
+        $onlydeleted = 0
     ): array {
         global $DB;
+
+        $includeimported = (bool) $includeimported;
+        $onlyimported = (bool) $onlyimported;
+        $includedeleted = (bool) $includedeleted;
+        $onlydeleted = (bool) $onlydeleted;
 
         [$selects, $params] = static::get_basic_select_from_parameters(
             $includedeleted,
