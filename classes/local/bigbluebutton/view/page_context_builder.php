@@ -24,6 +24,8 @@
 
 namespace bbbext_bnx\local\bigbluebutton\view;
 
+use bbbext_bnx\local\helpers\sidecar_helper;
+use bbbext_bnx\local\helpers\ui_string_helper;
 use core\check\result;
 use core\output\notification;
 use mod_bigbluebuttonbn\instance;
@@ -235,6 +237,7 @@ class page_context_builder {
 
         // Allow sidecars to adjust room data.
         $roomdata = $this->apply_sidecar_room_adjustments($roomdata);
+        $roomdata->presentationtitle = ui_string_helper::get('view_section_title_presentation');
 
         $context->room = $roomdata;
     }
@@ -247,7 +250,7 @@ class page_context_builder {
      * @return stdClass The adjusted room data.
      */
     private function apply_sidecar_room_adjustments(stdClass $roomdata): stdClass {
-        return \bbbext_bnx\local\helpers\sidecar_helper::apply_room_adjustments($this->instance, $roomdata);
+        return sidecar_helper::apply_room_adjustments($this->instance, $roomdata);
     }
 
     /**

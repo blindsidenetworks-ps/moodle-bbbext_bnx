@@ -65,7 +65,7 @@ class sidecar_helper {
      */
     public static function apply_room_adjustments(instance $instance, stdClass $roomdata): stdClass {
         $requiredclass = "\\bbbext_{pluginname}\\local\\helpers\\meeting_helper";
-        $sortedplugins = self::get_sorted_bnx_plugins($requiredclass);
+        $sortedplugins = self::get_sorted_sidecar_plugins($requiredclass);
 
         // Override room data with first available sidecar plugin that implements class.
         if (!empty($sortedplugins)) {
@@ -78,17 +78,26 @@ class sidecar_helper {
     }
 
     /**
-     * Get sorted bnx plugins by sortorder, optionally filtered by class.
+     * Get ordered sidecar plugin names based on extension sort order.
+     *
+     * @return array
+     */
+    public static function get_ordered_sidecar_plugins(): array {
+        return array_values(self::get_sorted_sidecar_plugins());
+    }
+
+    /**
+     * Get sorted sidecar plugins by sortorder, optionally filtered by class.
      *
      * @param string|null $requiredclass Class pattern with {pluginname} placeholder.
      * @return array
      */
-    private static function get_sorted_bnx_plugins(?string $requiredclass = null): array {
+    private static function get_sorted_sidecar_plugins(?string $requiredclass = null): array {
         $enabledplugins = self::get_enabled_plugins();
         $result = [];
         foreach (array_keys($enabledplugins) as $name) {
-            // Only sort bnx plugins.
-            if (!str_starts_with($name, 'bnx')) {
+            // Only sort bnx sidecar plugins.
+            if (!str_starts_with($name, 'bnx_')) {
                 continue;
             }
 

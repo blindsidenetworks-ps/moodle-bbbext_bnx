@@ -44,4 +44,3 @@ $string['section_waitingroom_desc'] = 'Require moderator approval before partici
 $string['section_waitingroom_heading'] = 'Waiting Room';
 $string['view_recording_search'] = 'Search';
 $string['view_recording_search_placeholder'] = 'Search for recordings';
-$string['view_section_title_presentation'] = 'Presentation files +';

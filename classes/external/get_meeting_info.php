@@ -16,6 +16,9 @@
 
 namespace bbbext_bnx\external;
 
+use bbbext_bnx\local\helpers\ui_string_helper;
+use core_external\external_single_structure;
+use core_external\external_value;
 use core_external\restricted_context_exception;
 use mod_bigbluebuttonbn\instance;
 
@@ -76,7 +79,19 @@ class get_meeting_info extends \mod_bigbluebuttonbn\external\meeting_info {
         if (array_key_exists('statusrunning', $meetinginfo)) {
             $result['statusrunning'] = $meetinginfo['statusrunning'];
         }
+        $result['presentationtitle'] = ui_string_helper::get('view_section_title_presentation');
 
         return $result;
+    }
+
+    /**
+     * Describe the return structure of the external service.
+     *
+     * @return external_single_structure
+     */
+    public static function execute_returns(): external_single_structure {
+        $structure = parent::execute_returns();
+        $structure->keys['presentationtitle'] = new external_value(PARAM_TEXT, 'Presentation section title', VALUE_OPTIONAL);
+        return $structure;
     }
 }
