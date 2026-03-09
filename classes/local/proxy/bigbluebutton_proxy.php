@@ -48,41 +48,7 @@ class bigbluebutton_proxy extends \mod_bigbluebuttonbn\local\proxy\bigbluebutton
     ): array {
         $createmeetingurl = self::action_url('create', $data, $metadata, $instanceid);
 
-        $curl = new curl();
-
-        if (!empty($presentations)) {
-            // Build a payload with multiple <document> entries under the presentation module.
-            $payload = "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'>";
-            foreach ($presentations as $p) {
-                // Each presentation object may be an array or object having a 'url' and 'name' key/prop.
-                $url = is_array($p) ? ($p['url'] ?? '') : ($p->url ?? '');
-                $name = is_array($p) ? ($p['name'] ?? '') : ($p->name ?? '');
-                if (empty($url)) {
-                    continue;
-                }
-                $escapedurl = htmlspecialchars($url, ENT_QUOTES | ENT_XML1, 'UTF-8');
-                $escapedname = htmlspecialchars($name, ENT_QUOTES | ENT_XML1, 'UTF-8');
-                $payload .= "<document url=\"$escapedurl\" filename=\"$escapedname\" />";
-            }
-            $payload .= "</module></modules>";
-
-            $xml = $curl->post($createmeetingurl, $payload);
-            if (is_string($xml)) {
-                $parsed = @simplexml_load_string($xml);
-                if ($parsed !== false) {
-                    $xml = $parsed;
-                }
-            }
-        } else {
-            // No presentations array, fall back to GET (same as core behavior without presentation upload).
-            $xml = $curl->get($createmeetingurl);
-            if (is_string($xml)) {
-                $parsed = @simplexml_load_string($xml);
-                if ($parsed !== false) {
-                    $xml = $parsed;
-                }
-            }
-        }
+        $xml = self::request_create_meeting_xml($createmeetingurl, $presentations);
 
         self::assert_returned_xml($xml);
 
@@ -100,5 +66,62 @@ class bigbluebutton_proxy extends \mod_bigbluebuttonbn\local\proxy\bigbluebutton
             'attendeePW' => (string) $xml->attendeePW,
             'moderatorPW' => (string) $xml->moderatorPW,
         ];
+    }
+
+    /**
+     * Request the create-meeting XML response.
+     *
+     * @param string $createmeetingurl
+     * @param array|null $presentations
+     * @return mixed
+     */
+    private static function request_create_meeting_xml(string $createmeetingurl, ?array $presentations) {
+        $curl = new curl();
+
+        if (empty($presentations)) {
+            return self::parse_xml_if_string($curl->get($createmeetingurl));
+        }
+
+        $payload = self::build_presentations_payload($presentations);
+        return self::parse_xml_if_string($curl->post($createmeetingurl, $payload));
+    }
+
+    /**
+     * Build XML payload for multiple presentations.
+     *
+     * @param array $presentations
+     * @return string
+     */
+    private static function build_presentations_payload(array $presentations): string {
+        $payload = "<?xml version='1.0' encoding='UTF-8'?><modules><module name='presentation'>";
+
+        foreach ($presentations as $presentation) {
+            $url = is_array($presentation) ? ($presentation['url'] ?? '') : ($presentation->url ?? '');
+            if (empty($url)) {
+                continue;
+            }
+
+            $name = is_array($presentation) ? ($presentation['name'] ?? '') : ($presentation->name ?? '');
+            $escapedurl = htmlspecialchars($url, ENT_QUOTES | ENT_XML1, 'UTF-8');
+            $escapedname = htmlspecialchars($name, ENT_QUOTES | ENT_XML1, 'UTF-8');
+            $payload .= "<document url=\"{$escapedurl}\" filename=\"{$escapedname}\" />";
+        }
+
+        return $payload . "</module></modules>";
+    }
+
+    /**
+     * Parse XML only when the response is a string.
+     *
+     * @param mixed $xml
+     * @return mixed
+     */
+    private static function parse_xml_if_string($xml) {
+        if (!is_string($xml)) {
+            return $xml;
+        }
+
+        $parsed = @simplexml_load_string($xml);
+        return $parsed !== false ? $parsed : $xml;
     }
 }

@@ -124,7 +124,7 @@ class sidecar_state_manager {
         $dependentsbyrequired = [];
         foreach ($plugininfos as $pluginname => $plugininfo) {
             $dependencies = $plugininfo->get_other_required_plugins();
-            foreach ($dependencies as $component => $requiredversion) {
+            foreach (array_keys($dependencies) as $component) {
                 if (!str_starts_with($component, 'bbbext_')) {
                     continue;
                 }

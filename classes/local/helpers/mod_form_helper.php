@@ -76,9 +76,9 @@ class mod_form_helper {
         if (!$mform->elementExists($name)) {
             return;
         }
-        for ($i = 0; $i < count($elements); $i++) {
+        foreach ($elements as $element) {
             $mform->insertElementBefore(
-                $elements[$i],
+                $element,
                 $name
             );
         }

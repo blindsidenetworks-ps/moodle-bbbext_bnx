@@ -71,12 +71,12 @@ class meeting extends \mod_bigbluebuttonbn\meeting {
      * Return meeting information for the specified instance.
      *
      * @param instance $instance
-     * @param bool $updatecache Whether to update the cache when fetching the information
+     * @param bool|null $updatecache Whether to update the cache when fetching the information
      * @return stdClass
      */
-    public static function get_meeting_info_for_instance(instance $instance, bool $updatecache = false): stdClass {
+    public static function get_meeting_info_for_instance(instance $instance, $updatecache = null): stdClass {
         $meeting = new self($instance);
-        return $meeting->do_get_meeting_info($updatecache);
+        return $meeting->do_get_meeting_info((bool) $updatecache);
     }
 
     /**
@@ -118,12 +118,12 @@ class meeting extends \mod_bigbluebuttonbn\meeting {
     /**
      * Return meeting information for this meeting.
      *
-     * @param bool $updatecache Whether to update the cache when fetching the information
+     * @param bool|null $updatecache Whether to update the cache when fetching the information
      * @return stdClass
      */
-    protected function do_get_meeting_info(bool $updatecache = false): stdClass {
+    protected function do_get_meeting_info($updatecache = null): stdClass {
         // Delegate most of the work to parent and then adjust the few fields we need to change.
-        $meetinginfo = parent::do_get_meeting_info($updatecache);
+        $meetinginfo = parent::do_get_meeting_info((bool) $updatecache);
 
         // Replace the join URL with our custom join URL builder.
         $meetinginfo->joinurl = \bbbext_bnx\local\helpers\joinurl_helper::build_join_url($this->instance)->out(false);
