@@ -87,6 +87,15 @@ class page_context_builder {
             );
         }
 
+        // Inject BNX Entitlement alert banners if the plugin is installed.
+        // NOTE: Guarded with class_exists() so bbbext_bnx does not hard-depend on bbbext_bnx_entitlement.
+        if (class_exists('\bbbext_bnx_entitlement\output\alert_renderer')) {
+            global $USER, $CFG;
+            $lang = $USER->lang ?? $CFG->lang ?? 'en';
+            $roomalerts = \bbbext_bnx_entitlement\helper\alert_helper::get_room_alerts($lang);
+            $context->bnxalerts = \bbbext_bnx_entitlement\output\alert_renderer::render($roomalerts);
+        }
+
         return $context;
     }
 
@@ -140,11 +149,13 @@ class page_context_builder {
             return '';
         }
 
+        $groupselectionwarning = '';
         if (count($groups) > 1) {
-            \core\notification::add(
+            $groupselectionwarning = $this->output->render(new notification(
                 get_string('view_groups_selection_warning', 'bigbluebuttonbn'),
-                \core\output\notification::NOTIFY_INFO
-            );
+                notification::NOTIFY_INFO,
+                false
+            ));
         }
 
         // For Separate Groups mode, hide "All Participants" for everyone (including teachers/admins).
@@ -158,7 +169,7 @@ class page_context_builder {
             $hideallparticipants
         );
 
-        return $groupsmenu . '<br><br>';
+        return $groupselectionwarning . $groupsmenu . '<br><br>';
     }
 
     /**
