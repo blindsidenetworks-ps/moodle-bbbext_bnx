@@ -55,6 +55,44 @@ class backup_bbbext_bnx_subplugin extends backup_subplugin {
             'bnxid' => backup::VAR_PARENTID,
         ]);
 
+        // Reminder timespan table.
+        $remindersrem = new backup_nested_element(
+            'bbbext_bnx_reminders',
+            null,
+            ['timespan', 'lastsent']
+        );
+        $remindersguests = new backup_nested_element(
+            'bbbext_bnx_reminders_guests',
+            ['id'],
+            [
+                'bigbluebuttonbnid',
+                'email',
+                'userfrom',
+                'issent',
+                'isenabled',
+                'usermodified',
+                'timemodified',
+                'timecreated',
+            ]
+        );
+
+        $wrapper->add_child($remindersrem);
+        $wrapper->add_child($remindersguests);
+
+        $remindersrem->set_source_table(
+            'bbbext_bnx_reminders',
+            ['bigbluebuttonbnid' => backup::VAR_PARENTID]
+        );
+
+        // Only include guest data if user info is being backed up.
+        $userinfo = $this->get_setting_value('userinfo');
+        if ($userinfo) {
+            $remindersguests->set_source_table(
+                'bbbext_bnx_reminders_guests',
+                ['bigbluebuttonbnid' => backup::VAR_PARENTID]
+            );
+        }
+
         return $subplugin;
     }
 }

@@ -27,6 +27,7 @@ namespace bbbext_bnx\bigbluebuttonbn;
 
 use bbbext_bnx\local\helpers\joinurl_helper;
 use bbbext_bnx\local\helpers\mod_form_helper;
+use bbbext_bnx\reminders_utils;
 use bbbext_bnx\local\services\bnx_settings_service;
 use bbbext_bnx\local\services\bnx_settings_service_interface;
 use mod_bigbluebuttonbn\instance;
@@ -88,6 +89,8 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
      * @return void
      */
     public function data_preprocessing(?array &$defaultvalues): void {
+        global $DB;
+
         if (empty($defaultvalues['id'])) {
             return;
         }
@@ -103,6 +106,14 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
                 continue;
             }
             $defaultvalues[$field] = (int)$settings[$setting];
+        }
+
+        // Preload reminder data from bnx_settings.
+        if (isset($settings['reminderenabled'])) {
+            $defaultvalues['bnx_reminderenabled'] = (int)$settings['reminderenabled'];
+        }
+        if (isset($settings['remindertoguestsenabled'])) {
+            $defaultvalues['bnx_remindertoguestsenabled'] = (int)$settings['remindertoguestsenabled'];
         }
     }
 
@@ -148,6 +159,11 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
 
         // Remove the wait room setting as it's replaced by approval before join.
         mod_form_helper::remove_element($this->mform, 'wait');
+
+        // Add reminder fields if the feature is enabled.
+        if (reminders_utils::is_reminders_enabled() && mod_form_helper::is_feature_editable('reminder')) {
+            mod_form_helper::add_reminder_fields($this->mform, $this->bigbluebuttonbndata);
+        }
     }
 
     /**
