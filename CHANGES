@@ -1,0 +1,5 @@
+0.1.0-beta.1 (March 11, 2026)
+- Added gateway-driven alert banner system for settings and room views.
+- Decoupled alert rendering from a specific sidecar by using a generic sidecar alert provider contract.
+- Improved sidecar integration (ordered plugin behavior and presentation title resolution).
+- Included multiple stability and quality fixes (guest lobby/group assignment, approvalbeforejoin, code quality).
