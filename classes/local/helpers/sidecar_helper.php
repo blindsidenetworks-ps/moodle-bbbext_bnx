@@ -28,6 +28,9 @@ use stdClass;
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 class sidecar_helper {
+    /** @var string Class pattern for optional room alert providers implemented by sidecars. */
+    private const ROOM_ALERT_PROVIDER_CLASS = '\\bbbext_{pluginname}\\local\\helpers\\alert_provider';
+
     /**
      * Get the list of enabled bbbext plugins.
      *
@@ -84,6 +87,50 @@ class sidecar_helper {
      */
     public static function get_ordered_sidecar_plugins(): array {
         return array_values(self::get_sorted_sidecar_plugins());
+    }
+
+    /**
+     * Render room alerts from enabled sidecar providers.
+     *
+     * Sidecars can implement:
+     *   \bbbext_{pluginname}\local\helpers\alert_provider::render_room_alerts(string $lang): string
+     *
+     * @param string $lang Current user language code.
+     * @return string Rendered HTML from all providers (ordered by sort order).
+     */
+    public static function render_room_alerts(string $lang): string {
+        $providers = self::get_room_alert_provider_classes();
+        if (empty($providers)) {
+            return '';
+        }
+
+        $output = '';
+        foreach ($providers as $providerclass) {
+            $rendered = $providerclass::render_room_alerts($lang);
+            if (!empty($rendered)) {
+                $output .= $rendered;
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * Resolve enabled sidecar classes implementing the room alert provider contract.
+     *
+     * @return array Ordered list of fully-qualified provider class names.
+     */
+    public static function get_room_alert_provider_classes(): array {
+        $providers = [];
+        foreach (self::get_ordered_sidecar_plugins() as $pluginname) {
+            $classname = str_replace('{pluginname}', $pluginname, self::ROOM_ALERT_PROVIDER_CLASS);
+            if (!class_exists($classname) || !method_exists($classname, 'render_room_alerts')) {
+                continue;
+            }
+            $providers[] = $classname;
+        }
+
+        return $providers;
     }
 
     /**

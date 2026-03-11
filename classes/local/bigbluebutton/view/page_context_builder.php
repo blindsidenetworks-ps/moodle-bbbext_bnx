@@ -87,14 +87,9 @@ class page_context_builder {
             );
         }
 
-        // Inject BNX Entitlement alert banners if the plugin is installed.
-        // NOTE: Guarded with class_exists() so bbbext_bnx does not hard-depend on bbbext_bnx_entitlement.
-        if (class_exists('\bbbext_bnx_entitlement\output\alert_renderer')) {
-            global $USER, $CFG;
-            $lang = $USER->lang ?? $CFG->lang ?? 'en';
-            $roomalerts = \bbbext_bnx_entitlement\helper\alert_helper::get_room_alerts($lang);
-            $context->bnxalerts = \bbbext_bnx_entitlement\output\alert_renderer::render($roomalerts);
-        }
+        global $USER, $CFG;
+        $lang = $USER->lang ?? $CFG->lang ?? 'en';
+        $context->bnxalerts = sidecar_helper::render_room_alerts($lang);
 
         return $context;
     }
