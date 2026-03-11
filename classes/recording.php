@@ -78,6 +78,7 @@ class recording extends base_recording {
      * @param int|bool $onlyimported
      * @param int|bool $filterbygroups
      * @return recording[]
+      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public static function get_recordings_for_instance(
         instance $instance,
@@ -125,6 +126,7 @@ class recording extends base_recording {
      * @param int|bool $includedeleted
      * @param int|bool $onlydeleted
      * @return recording[]
+      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public static function get_recordings_for_course(
         int $courseid,
@@ -181,6 +183,7 @@ class recording extends base_recording {
      * @param array $selects
      * @param array $params
      * @return recording[]
+      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected static function fetch_records(array $selects, array $params): array {
         global $DB, $CFG;
@@ -285,6 +288,7 @@ class recording extends base_recording {
      * @param int $groupid
      * @param int $groupingid
      * @return array
+      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected static function get_select_for_group($groupmode, $context, $courseid, $groupid = 0, $groupingid = 0): array {
         global $DB, $USER;

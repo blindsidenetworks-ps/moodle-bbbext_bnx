@@ -119,6 +119,8 @@ function bbbext_bnx_extend_navigation_user_settings(
     stdClass $course,
     context_course $coursecontext
 ) {
+    unset($user, $context, $course, $coursecontext);
+
     if (!\bbbext_bnx\reminders_utils::is_reminders_enabled()) {
         return;
     }

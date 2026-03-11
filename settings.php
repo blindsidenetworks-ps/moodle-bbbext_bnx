@@ -21,7 +21,7 @@
  * when BigBlueButton is pre-configured via config.php.
  *
  * @package    bbbext_bnx
- * @copyright 2025 onwards, Blindside Networks Inc
+ * @copyright  2025 onwards, Blindside Networks Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author     Shamiso Jaravaza (shamiso [dt] jaravaza [at] blindsidenetworks [dt] com)
  */

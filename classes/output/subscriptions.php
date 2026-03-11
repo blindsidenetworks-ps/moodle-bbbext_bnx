@@ -51,6 +51,8 @@ class subscriptions implements renderable, templatable {
      * @return stdClass
      */
     public function export_for_template(renderer_base $output) {
+        unset($output);
+
         $courses = enrol_get_users_courses($this->userid);
         $instances = [];
         foreach ($courses as $course) {

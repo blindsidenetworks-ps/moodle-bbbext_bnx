@@ -50,6 +50,9 @@ class check_emails_reminder extends scheduled_task {
      * Execute the scheduled task.
      *
      * @return void
+      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+      * @SuppressWarnings(PHPMD.NPathComplexity)
+      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function execute() {
         global $DB;
