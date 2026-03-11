@@ -73,7 +73,6 @@ class meeting extends \mod_bigbluebuttonbn\meeting {
      * @param instance $instance
      * @param bool|null $updatecache Whether to update the cache when fetching the information
      * @return stdClass
-      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public static function get_meeting_info_for_instance(instance $instance, $updatecache = null): stdClass {
         $meeting = new self($instance);
@@ -121,7 +120,6 @@ class meeting extends \mod_bigbluebuttonbn\meeting {
      *
      * @param bool|null $updatecache Whether to update the cache when fetching the information
      * @return stdClass
-      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     protected function do_get_meeting_info($updatecache = null): stdClass {
         // Delegate most of the work to parent and then adjust the few fields we need to change.

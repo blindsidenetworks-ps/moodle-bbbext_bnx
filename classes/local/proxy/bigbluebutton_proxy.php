@@ -39,7 +39,6 @@ class bigbluebutton_proxy extends \mod_bigbluebuttonbn\local\proxy\bigbluebutton
      * @param int|null $instanceid
      * @return array
      * @throws \mod_bigbluebuttonbn\local\exceptions\bigbluebutton_exception
-      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public static function create_meeting_with_presentations(
         array $data,
