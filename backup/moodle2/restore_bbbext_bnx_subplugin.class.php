@@ -41,6 +41,16 @@ class restore_bbbext_bnx_subplugin extends restore_subplugin {
             $this->get_pathfor('/bbbext_bnx/bbbext_bnx_settings')
         );
 
+        $paths[] = new restore_path_element(
+            $this->get_namefor('reminder'),
+            $this->get_pathfor('/bbbext_bnx_reminders')
+        );
+
+        $paths[] = new restore_path_element(
+            $this->get_namefor('reminderguest'),
+            $this->get_pathfor('/bbbext_bnx_reminders_guests')
+        );
+
         return $paths;
     }
 
@@ -87,5 +97,36 @@ class restore_bbbext_bnx_subplugin extends restore_subplugin {
             $data->timemodified = time();
         }
         $DB->insert_record('bbbext_bnx_settings', $data);
+    }
+
+    /**
+     * Restore a reminder timespan record.
+     *
+     * @param array $data
+     */
+    public function process_bbbext_bnx_reminder($data) {
+        global $DB;
+
+        $data = (object) $data;
+        $data->bigbluebuttonbnid = $this->get_new_parentid('bigbluebuttonbn');
+        $DB->insert_record('bbbext_bnx_reminders', $data);
+    }
+
+    /**
+     * Restore a guest email record.
+     *
+     * @param array $data
+     */
+    public function process_bbbext_bnx_reminderguest($data) {
+        global $DB;
+
+        $data = (object) $data;
+        $data->bigbluebuttonbnid = $this->get_new_parentid('bigbluebuttonbn');
+        $data->usermodified = $this->get_mappingid('user', $data->usermodified);
+        $data->userfrom = $this->get_mappingid('user', $data->userfrom);
+        $data->timecreated = $this->apply_date_offset($data->timecreated);
+        $data->timemodified = $this->apply_date_offset($data->timemodified);
+        $newitemid = $DB->insert_record('bbbext_bnx_reminders_guests', $data);
+        $this->set_mapping('bbbext_bnx_reminders_guests', $data->id, $newitemid);
     }
 }
