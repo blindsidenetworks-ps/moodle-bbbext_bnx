@@ -65,6 +65,9 @@ if ($state !== null && ($email || $userid)) {
     );
 }
 
+// Interactive form flow requires authentication.
+require_login();
+
 // Show confirmation form for manual unsubscription.
 $customdata = [
     'cmid' => $cmid,

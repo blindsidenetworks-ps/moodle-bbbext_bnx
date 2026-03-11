@@ -284,7 +284,7 @@ final class check_email_reminder_test extends \advanced_testcase {
         );
 
         // Disable the plugin.
-        set_config('enabled', 0, 'bbbext_bnx');
+        set_config('disabled', 1, 'bbbext_bnx');
         \core_plugin_manager::reset_caches();
 
         $task = new check_emails_reminder();
@@ -294,7 +294,7 @@ final class check_email_reminder_test extends \advanced_testcase {
         $this->assertEquals(0, $emailsink->count());
 
         // Re-enable for cleanup.
-        set_config('enabled', 1, 'bbbext_bnx');
+        unset_config('disabled', 'bbbext_bnx');
         \core_plugin_manager::reset_caches();
     }
 }

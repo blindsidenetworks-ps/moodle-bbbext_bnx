@@ -41,6 +41,8 @@ use bbbext_bnx\output\recordings_session;
 
 /**
  * Generates the template context for the BNX view page.
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class page_context_builder {
     /** @var instance */

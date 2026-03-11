@@ -80,12 +80,11 @@ final class reminder_mod_instance_helper_test extends \advanced_testcase {
             ['bigbluebuttonbnid' => $bbbinstance->get_instance_id()]
         );
         $this->assertCount(3, $existingreminders);
-        $this->assertEquals(
-            ['P1D', 'PT1H', 'PT2H'],
-            array_values(
-                array_map(fn($r) => $r->timespan, $existingreminders)
-            )
+        $timespans = array_values(
+            array_map(fn($r) => $r->timespan, $existingreminders)
         );
+        sort($timespans);
+        $this->assertEquals(['P1D', 'PT1H', 'PT2H'], $timespans);
 
         // Now update: remove PT2H, add P2D.
         $data->bnx_paramcount = 2;
@@ -114,7 +113,7 @@ final class reminder_mod_instance_helper_test extends \advanced_testcase {
         $this->setAdminUser();
 
         // Disable the plugin.
-        set_config('enabled', 0, 'bbbext_bnx');
+        set_config('disabled', 1, 'bbbext_bnx');
         \core_plugin_manager::reset_caches();
 
         $generator = $this->getDataGenerator();
@@ -143,7 +142,7 @@ final class reminder_mod_instance_helper_test extends \advanced_testcase {
         $this->assertEquals(0, $count);
 
         // Re-enable for cleanup.
-        set_config('enabled', 1, 'bbbext_bnx');
+        unset_config('disabled', 'bbbext_bnx');
         \core_plugin_manager::reset_caches();
     }
 }
