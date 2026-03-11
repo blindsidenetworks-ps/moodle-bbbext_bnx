@@ -46,6 +46,12 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
      */
     private const BNX_TABLE = 'bbbext_bnx';
 
+    /** Table storing individual reminder timespans. */
+    public const REMINDERS_TABLE = 'bbbext_bnx_reminders';
+
+    /** Table storing guest emails for reminders. */
+    public const REMINDERS_GUESTS_TABLE = 'bbbext_bnx_reminders_guests';
+
     /**
      * Mapping between form fields and stored setting names.
      */
@@ -90,6 +96,7 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
         if ($bnxid !== null) {
             $this->persist_settings($bnxid, $bigbluebuttonbn);
         }
+        $this->sync_reminder_data($bigbluebuttonbn);
     }
 
     /**
@@ -103,6 +110,7 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
         if ($bnxid !== null) {
             $this->persist_settings($bnxid, $bigbluebuttonbn);
         }
+        $this->sync_reminder_data($bigbluebuttonbn);
     }
 
     /**
@@ -112,6 +120,8 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
      * @return void
      */
     public function delete_instance(int $moduleid): void {
+        global $DB;
+
         $bnxid = $this->get_bnx_id($moduleid);
         if ($bnxid === null) {
             return;
@@ -119,6 +129,10 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
 
         $this->bnxservice->delete_bnx($moduleid);
         $this->service->delete_settings($bnxid);
+
+        // Clean up reminder tables.
+        $DB->delete_records(self::REMINDERS_TABLE, ['bigbluebuttonbnid' => $moduleid]);
+        $DB->delete_records(self::REMINDERS_GUESTS_TABLE, ['bigbluebuttonbnid' => $moduleid]);
     }
 
     /**
@@ -130,6 +144,73 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
         return [
             self::BNX_TABLE,
         ];
+    }
+
+    /**
+     * Sync reminder data (enabled flags and timespan rows) from form submission.
+     *
+     * @param stdClass $data module data payload
+     * @return void
+     */
+    private function sync_reminder_data(stdClass $data): void {
+        global $DB;
+
+        if (!\bbbext_bnx\reminders_utils::is_reminders_enabled()) {
+            return;
+        }
+
+        $moduleid = $this->resolve_module_id($data);
+        if ($moduleid === null) {
+            return;
+        }
+
+        // Sync the reminder enabled flags via bnx_settings.
+        $bnxid = $this->get_bnx_id($moduleid);
+        if ($bnxid !== null) {
+            $this->service->set_settings($bnxid, [
+                'reminderenabled' => !empty($data->bnx_reminderenabled) ? '1' : '0',
+                'remindertoguestsenabled' => !empty($data->bnx_remindertoguestsenabled) ? '1' : '0',
+            ]);
+        }
+
+        // Sync timespan rows.
+        if (!isset($data->bnx_paramcount)) {
+            return;
+        }
+
+        $submittedtimespans = [];
+        if (!empty($data->bnx_timespan)) {
+            $timespans = is_array($data->bnx_timespan) ? $data->bnx_timespan : [$data->bnx_timespan];
+            for ($i = 0; $i < (int)$data->bnx_paramcount; $i++) {
+                if (isset($timespans[$i]) && !empty($timespans[$i])) {
+                    $submittedtimespans[] = $timespans[$i];
+                }
+            }
+        }
+
+        $existingreminders = $DB->get_records(
+            self::REMINDERS_TABLE,
+            ['bigbluebuttonbnid' => $moduleid]
+        );
+        $existingtimespans = array_map(fn($r) => $r->timespan, $existingreminders);
+
+        // Delete removed timespans.
+        foreach ($existingreminders as $existing) {
+            if (!in_array($existing->timespan, $submittedtimespans)) {
+                $DB->delete_records(self::REMINDERS_TABLE, ['id' => $existing->id]);
+            }
+        }
+
+        // Add new timespans.
+        foreach ($submittedtimespans as $timespan) {
+            if (!in_array($timespan, $existingtimespans)) {
+                $DB->insert_record(self::REMINDERS_TABLE, (object) [
+                    'bigbluebuttonbnid' => $moduleid,
+                    'timespan' => $timespan,
+                    'lastsent' => 0,
+                ]);
+            }
+        }
     }
 
     /**

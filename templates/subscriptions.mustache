@@ -1,0 +1,94 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template bbbext_bnx/subscriptions
+
+    This template renders the subscriptions management page.
+
+    Example context (json):
+    {
+      "instances": [
+            {
+              "id": "10",
+              "name": "Test Meeting",
+              "toggle": {
+                "name": "state",
+                "method": "get",
+                "url": "https://moodle.com",
+                "cmid": "4",
+                "id": "reality-toggle-3",
+                "checked": true,
+                "disabled": false,
+                "label": "Enable/disable",
+                "labelclasses": "sr-only"
+              },
+              "subscribed": true
+            }
+        ]
+    }
+}}
+<div class="bbbext_bnx_subscriptions">
+  <div class="card-header">
+    <h5 class="card-title">{{#str}}subscriptions, bbbext_bnx{{/str}}</h5>
+  </div>
+  <div class="card-body">
+    <div class="d-flex flex-column">
+      {{#instances}}
+        <div class="card m-3">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div class="align-self-start">
+                <a class="align-self-start" href="{{url}}">{{name}}</a>
+                {{#subscribed}}
+                  {{#pix}} i/checked, core, {{#str}}subscribed, bbbext_bnx{{/str}}{{/pix}}
+                {{/subscribed}}
+                {{^subscribed}}
+                  {{#pix}} e/cancel, core, {{#str}}unsubscribed, bbbext_bnx{{/str}}{{/pix}}
+                {{/subscribed}}
+
+                <div class="coursename" style="margin-top: 5px; text-align: left;">
+                  <span>{{coursename}}</span>
+                </div>
+              </div>
+
+              <div class="align-self-end">
+                {{#toggle}}
+                  <form action="{{url}}" method="get" onchange="this.submit();">
+                    <div class="custom-control custom-switch">
+                      <input type="hidden" name="cmid" value="{{cmid}}" />
+                      {{#subscribed}}
+                        <input type="hidden" name="{{name}}" value="0" />
+                      {{/subscribed}}
+                      <input type="checkbox" class="custom-control-input" name="{{name}}" value="{{value}}" id="{{$id}}{{id}}{{/id}}"
+                      {{#checked}}checked{{/checked}}
+                      {{#disabled}}disabled{{/disabled}}>
+                      {{$labelmarkup}}
+                      <label class="custom-control-label" for="{{$id}}{{id}}{{/id}}">
+                        <span class="col">{{$label}}{{label}}{{/label}}</span>
+                      </label>
+                      {{/labelmarkup}}
+                    </div>
+                  </form>
+                {{/toggle}}
+              </div>
+            </div>
+          </div>
+        </div>
+      {{/instances}}
+    </div>
+  </div>
+</div>

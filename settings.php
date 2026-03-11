@@ -18,7 +18,7 @@
  * TODO describe file settings
  *
  * @package    bbbext_bnx
- * @copyright 2025 onwards, Blindside Networks Inc
+ * @copyright  2025 onwards, Blindside Networks Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author     Shamiso Jaravaza (shamiso [dt] jaravaza [at] blindsidenetworks [dt] com)
  */
@@ -29,6 +29,9 @@ if ($ADMIN->fulltree) {
     $featuresbysection = [
         'waitingroom' => [
             'approvalbeforejoin',
+        ],
+        'reminders' => [
+            'reminder',
         ],
     ];
 
@@ -61,4 +64,32 @@ if ($ADMIN->fulltree) {
             ));
         }
     }
+
+    // Email customisation settings for reminders.
+    $settings->add(new admin_setting_heading(
+        'bbbext_bnx/emailcontent',
+        get_string('emailcontent', 'bbbext_bnx'),
+        get_string('emailcontent:desc', 'bbbext_bnx')
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'bbbext_bnx/emailsubject',
+        get_string('emailsubject', 'bbbext_bnx'),
+        get_string('emailsubject:desc', 'bbbext_bnx'),
+        get_string('emailsubject:default', 'bbbext_bnx')
+    ));
+
+    $settings->add(new admin_setting_confightmleditor(
+        'bbbext_bnx/emailtemplate',
+        get_string('emailtemplate', 'bbbext_bnx'),
+        get_string('emailtemplate:desc', 'bbbext_bnx'),
+        get_string('emailtemplate:default', 'bbbext_bnx')
+    ));
+
+    $settings->add(new admin_setting_confightmleditor(
+        'bbbext_bnx/emailfooter',
+        get_string('emailfooter', 'bbbext_bnx'),
+        get_string('emailfooter:desc', 'bbbext_bnx'),
+        ''
+    ));
 }

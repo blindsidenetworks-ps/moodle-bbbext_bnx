@@ -24,24 +24,62 @@
 
 namespace bbbext_bnx\privacy;
 
-use core_privacy\local\metadata\null_provider;
+use core_privacy\local\metadata\collection;
+use core_privacy\local\request\writer;
 
 /**
- * Privacy Subsystem for bbbext_bnx implementing null_provider.
+ * Privacy Subsystem for bbbext_bnx implementing metadata and user preference providers.
  *
  * @package   bbbext_bnx
  * @copyright 2025 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
-class provider implements null_provider {
+class provider implements
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\user_preference_provider {
     /**
-     * Get the language string identifier with the component's language
-     * file to explain why this plugin stores no data.
+     * Provides metadata about the personal data stored.
      *
-     * @return  string
+     * @param collection $collection The metadata collection to update.
+     * @return collection
      */
-    public static function get_reason(): string {
-        return 'privacy:metadata';
+    public static function get_metadata(collection $collection): collection {
+        $collection->add_user_preference(
+            'bbbext_bnx_reminder',
+            'privacy:metadata:preference:bbbext_bnx_reminder'
+        );
+        return $collection;
+    }
+
+    /**
+     * Export the user preferences for reminders.
+     *
+     * @param int $userid The user ID to export data for.
+     * @return void
+     */
+    public static function export_user_preferences(int $userid): void {
+        global $DB;
+
+        $preferences = $DB->get_records_sql(
+            "SELECT * FROM {user_preferences} WHERE userid = ? AND name LIKE ?",
+            [$userid, 'bbbext_bnx_reminder_%']
+        );
+
+        foreach ($preferences as $pref) {
+            // Extract the activity ID from the preference name.
+            $activityid = str_replace('bbbext_bnx_reminder_', '', $pref->name);
+            $preference = (int) $pref->value
+                ? 'privacy:reminderpreferenceyes'
+                : 'privacy:reminderpreferenceno';
+            $description = get_string($preference, 'bbbext_bnx', ['activityid' => $activityid]);
+
+            writer::export_user_preference(
+                'bbbext_bnx',
+                $pref->name,
+                $pref->value,
+                $description
+            );
+        }
     }
 }

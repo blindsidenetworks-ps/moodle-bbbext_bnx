@@ -38,3 +38,111 @@ function bbbext_bnx_inplace_editable(string $itemtype, string $itemid, $newvalue
 
     return null; // Let core throw the standard exception for unknown editables.
 }
+
+/**
+ * Add FontAwesome icon mapping.
+ *
+ * @return string[]
+ */
+function bbbext_bnx_get_fontawesome_icon_map() {
+    return [
+        'bbbext_bnx:i/bell' => 'fa-bell-o',
+    ];
+}
+
+/**
+ * Serves attached files for email reminders.
+ *
+ * @param mixed $course course or id of the course
+ * @param mixed $cm course module or id of the course module
+ * @param context $context
+ * @param string $filearea
+ * @param array $args
+ * @param bool $forcedownload
+ * @param array $options additional options affecting the file serving
+ * @return bool false if file not found, does not return if found
+ */
+function bbbext_bnx_pluginfile(
+    $course,
+    $cm,
+    context $context,
+    $filearea,
+    $args,
+    $forcedownload,
+    array $options = []
+) {
+    if ($context->contextlevel != CONTEXT_MODULE) {
+        return false;
+    }
+
+    require_login($course, false, $cm);
+    $canview = has_capability('mod/bigbluebuttonbn:view', $context);
+
+    if ($filearea === \bbbext_bnx\reminders_utils::EMAIL_REMINDER_FILEAREA) {
+        $canview = true; // External users can see the image.
+    }
+
+    if (!$canview) {
+        return false;
+    }
+
+    $itemid = (int) array_shift($args);
+    if ($itemid != 0) {
+        return false;
+    }
+
+    $relativepath = implode('/', $args);
+    $fullpath = "/{$context->id}/bbbext_bnx/$filearea/$itemid/$relativepath";
+
+    $fs = get_file_storage();
+    $file = $fs->get_file_by_hash(sha1($fullpath));
+    if (!$file || $file->is_directory()) {
+        return false;
+    }
+    send_stored_file($file, 0, 0, $forcedownload, $options);
+}
+
+/**
+ * Add a reminder preferences link to user settings navigation.
+ *
+ * @param navigation_node $useraccount
+ * @param stdClass $user
+ * @param context_user $context
+ * @param stdClass $course
+ * @param context_course $coursecontext
+ * @return void
+ */
+function bbbext_bnx_extend_navigation_user_settings(
+    navigation_node $useraccount,
+    stdClass $user,
+    context_user $context,
+    stdClass $course,
+    context_course $coursecontext
+) {
+    unset($user, $context, $course, $coursecontext);
+
+    if (!\bbbext_bnx\reminders_utils::is_reminders_enabled()) {
+        return;
+    }
+    $parent = $useraccount->parent->find('useraccount', navigation_node::TYPE_CONTAINER);
+    if ($parent) {
+        $parent->add(
+            get_string('reminders:preferences', 'bbbext_bnx'),
+            new moodle_url('/mod/bigbluebuttonbn/extension/bnx/managesubscriptions.php')
+        );
+    }
+}
+
+/**
+ * Callback when guests are added to a meeting — store their emails for reminders.
+ *
+ * @param array $emails
+ * @param int $instanceid
+ * @return void
+ */
+function bbbext_bnx_meeting_add_guests(array $emails, int $instanceid): void {
+    global $USER;
+    foreach ($emails as $email) {
+        \bbbext_bnx\local\persistent\guest_email::create_guest_mail_record($email, $instanceid, $USER->id);
+    }
+}
