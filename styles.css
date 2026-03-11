@@ -30,3 +30,59 @@
         max-width: 100px;
     }
 }
+
+/* Recordings table column sizing. */
+.bnx-recordings-table {
+    table-layout: auto;
+    width: 100%;
+}
+
+.bnx-recordings-table th,
+.bnx-recordings-table td {
+    vertical-align: middle;
+}
+
+.bnx-recordings-table .bnx-col-playback,
+.bnx-recordings-table .bnx-col-duration {
+    white-space: nowrap;
+    width: 1%;
+}
+
+.bnx-recordings-table .bnx-col-preview {
+    width: 150px;
+}
+
+.bnx-recordings-table .bnx-col-date {
+    white-space: nowrap;
+}
+
+.bnx-recordings-table .bnx-col-actionbar {
+    white-space: nowrap;
+    width: 1%;
+}
+
+.bnx-recordings-table .sortable-header {
+    cursor: pointer;
+}
+
+/* Compact actionbar — only active toggle icons are rendered. */
+.bnx-actionbar .d-flex {
+    gap: 0.15rem;
+}
+
+.bnx-actionbar-item {
+    flex: 0 0 auto;
+}
+
+.bnx-actionbar-item .action-icon,
+.bnx-actionbar-item a {
+    padding: 0.2rem 0.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bnx-actionbar-item .iconsmall {
+    width: 16px;
+    height: 16px;
+}

@@ -27,15 +27,20 @@ export const sortTable = (column) => {
         return;
     }
 
-    const rows = Array.from(tableContainer.querySelectorAll('.row.mb-3.align-items-center'));
+    const tbody = tableContainer.querySelector('.bnx-recordings-table tbody');
+    if (!tbody) {
+        return;
+    }
+
+    const rows = Array.from(tbody.querySelectorAll('tr.bnx-recording-row'));
 
     rows.sort((rowA, rowB) => {
         let valueA;
         let valueB;
 
         if (column === 'date') {
-            const dateAElement = rowA.querySelector(".col-md-2[data-sort='date']");
-            const dateBElement = rowB.querySelector(".col-md-2[data-sort='date']");
+            const dateAElement = rowA.querySelector("td[data-sort='date']");
+            const dateBElement = rowB.querySelector("td[data-sort='date']");
 
             if (!dateAElement || !dateBElement) {
                 return 0;
@@ -47,9 +52,8 @@ export const sortTable = (column) => {
             return sortOrders[column] ? dateA - dateB : dateB - dateA;
         }
 
-        const columnSelector = `.col-md-${column === 'name' ? 1 : 2}[data-sort='${column}']`;
-        const elementA = rowA.querySelector(columnSelector);
-        const elementB = rowB.querySelector(columnSelector);
+        const elementA = rowA.querySelector(`td[data-sort='${column}']`);
+        const elementB = rowB.querySelector(`td[data-sort='${column}']`);
 
         if (!elementA || !elementB) {
             return 0;
@@ -62,7 +66,7 @@ export const sortTable = (column) => {
     });
 
     rows.forEach(row => {
-        tableContainer.appendChild(row);
+        tbody.appendChild(row);
     });
 
     sortOrders[column] = !sortOrders[column];

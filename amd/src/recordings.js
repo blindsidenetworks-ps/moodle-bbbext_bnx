@@ -25,6 +25,23 @@ import {getString} from 'core/str';
 import {sortTable} from './recordings_sorting';
 import {setupPagination} from './recordings_pagination';
 
+const actionsWithCustomConfirmation = ['publish', 'unpublish', 'protect', 'unprotect'];
+
+const getConfirmationString = async(action, recordingType = null) => {
+    const key = `view_recording_${action}_confirmation`;
+    const args = recordingType === null ? [] : [recordingType];
+
+    if (actionsWithCustomConfirmation.includes(action)) {
+        try {
+            return await getString(key, 'bbbext_bnx', ...args);
+        } catch (error) {
+            // Fall back to core string.
+        }
+    }
+
+    return getString(key, 'bigbluebuttonbn', ...args);
+};
+
 /**
  * Handles an action (e.g., delete, publish, unpublish, lock, etc.) for a recording.
  *
@@ -80,7 +97,7 @@ const requestPlainAction = async(element) => {
 const getRecordingConfirmationMessage = async(data) => {
     const playbackElement = document.querySelector(`#playbacks-${data.recordingid}`);
     if (!playbackElement) {
-        return getString(`view_recording_${data.action}_confirmation`, 'bigbluebuttonbn');
+        return getConfirmationString(data.action);
     }
 
     const recordingType = await getString(
@@ -88,11 +105,7 @@ const getRecordingConfirmationMessage = async(data) => {
         'bigbluebuttonbn'
     );
 
-    const confirmation = await getString(
-        `view_recording_${data.action}_confirmation`,
-        'bigbluebuttonbn',
-        recordingType
-    );
+    const confirmation = await getConfirmationString(data.action, recordingType);
 
     if (data.action === 'import') {
         return confirmation;
@@ -158,12 +171,7 @@ const initPreviewEnhancements = () => {
         }
 
         container.querySelectorAll('.text-center.text-muted.small').forEach((help) => {
-            const helpContainer = help.closest('.row');
-            if (helpContainer) {
-                helpContainer.remove();
-            } else {
-                help.remove();
-            }
+            help.remove();
         });
 
         const thumbnails = container.querySelectorAll('img.recording-thumbnail');
@@ -209,7 +217,7 @@ const initPreviewEnhancements = () => {
         const primaryThumbnail = thumbnailArray[0];
         primaryThumbnail.dataset.previewIndex = '0';
 
-        const parentRow = primaryThumbnail.closest('.row') ?? container;
+        const parentRow = primaryThumbnail.closest('td') || primaryThumbnail.closest('.row') || container;
 
         thumbnailArray.slice(1).forEach((thumb, index) => {
             thumb.dataset.previewIndex = String(index + 1);

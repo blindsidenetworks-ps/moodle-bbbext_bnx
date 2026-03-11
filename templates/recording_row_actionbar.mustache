@@ -51,10 +51,10 @@
         ]
     }
 }}
-<div {{#id}}id="{{.}}"{{/id}} {{#recordingid}}data-recordingid="{{.}}"{{/recordingid}}>
-    <div class="d-flex flex-row">
+<div {{#id}}id="{{.}}"{{/id}} {{#recordingid}}data-recordingid="{{.}}"{{/recordingid}} class="bnx-actionbar">
+    <div class="d-flex flex-row flex-nowrap align-items-center">
         {{#tools}}
-            <div>
+            <div class="bnx-actionbar-item">
                 {{>core/action_link}}
             </div>
         {{/tools}}

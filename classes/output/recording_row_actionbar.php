@@ -48,8 +48,13 @@ class recording_row_actionbar extends base_recording_row_actionbar {
                 $disabledwhen = $buttonpayload['disablewhen'] ?? null;
                 $this->actionbar_update_display($buttonpayload, $disabledwhen, $this->recording, 'disabled');
                 $this->actionbar_update_display($buttonpayload, $conditionalhiding, $this->recording);
+                // Skip rendering invisible toggle tools entirely so they don't occupy space.
+                if (isset($buttonpayload['disabled']) && $buttonpayload['disabled'] === 'invisible') {
+                    continue;
+                }
                 if (!empty($buttonpayload)) {
                     $iconortext = '';
+                    $actionlabel = $this->get_actionbar_label($buttonpayload['action']);
                     $target = $buttonpayload['action'];
                     if (isset($buttonpayload['target'])) {
                         $target .= '-' . $buttonpayload['target'];
@@ -78,7 +83,7 @@ class recording_row_actionbar extends base_recording_row_actionbar {
                         $linkattributes['class'] .= ' disabled';
                         $icon = new pix_icon(
                             'i/' . $buttonpayload['icon'],
-                            get_string('view_recording_list_actionbar_' . $buttonpayload['action'], 'bigbluebuttonbn'),
+                            $actionlabel,
                             'moodle',
                             $iconattributes
                         );
@@ -95,7 +100,7 @@ class recording_row_actionbar extends base_recording_row_actionbar {
                     }
                     $icon = new pix_icon(
                         'i/' . $buttonpayload['icon'],
-                        get_string('view_recording_list_actionbar_' . $buttonpayload['action'], 'bigbluebuttonbn'),
+                        $actionlabel,
                         'moodle',
                         $iconattributes
                     );
@@ -106,6 +111,22 @@ class recording_row_actionbar extends base_recording_row_actionbar {
             }
         }
         return $context;
+    }
+
+    /**
+     * Resolve tooltip label for actionbar icons.
+     *
+     * @param string $action
+     * @return string
+     */
+    private function get_actionbar_label(string $action): string {
+        $key = 'view_recording_list_actionbar_' . $action;
+        if (in_array($action, ['publish', 'unpublish'], true)
+            && get_string_manager()->string_exists($key, 'bbbext_bnx')) {
+            return get_string($key, 'bbbext_bnx');
+        }
+
+        return get_string($key, 'bigbluebuttonbn');
     }
 
     /**
