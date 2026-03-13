@@ -57,10 +57,12 @@ class observer {
     }
 
     /**
-     * React to subplugin state changes and enable related BigBlueButton settings.
+     * React to subplugin state changes via generic callback discovery.
      *
-     * This observer runs in the always-enabled parent plugin so it fires even
-     * when the relevant subplugin is currently disabled.
+     * When any bbbext subplugin is enabled, this observer checks whether the
+     * plugin defines a {@see \<plugin>\plugininfo_callbacks::on_enable()} method
+     * and invokes it. This allows each sidecar to declare its own enable-time
+     * behaviour without requiring changes to the parent plugin.
      *
      * @param \core\event\config_log_created $event
      * @return void
@@ -75,13 +77,15 @@ class observer {
         $plugin = $other['plugin'] ?? '';
         $disabled = (int)($other['value'] ?? 0) === 1;
 
-        if ($disabled) {
+        // Only act on enable events for bbbext plugins.
+        if ($disabled || strpos($plugin, 'bbbext_') !== 0) {
             return;
         }
 
-        // Enabling bnx_preuploads: ensure pre-upload presentations are editable.
-        if ($plugin === 'bbbext_bnx_preuploads') {
-            set_config('bigbluebuttonbn_preuploadpresentation_editable', 1);
+        // Generic callback discovery: invoke the sidecar's on_enable() if defined.
+        $callbackclass = '\\' . $plugin . '\\plugininfo_callbacks';
+        if (class_exists($callbackclass) && method_exists($callbackclass, 'on_enable')) {
+            $callbackclass::on_enable();
         }
     }
 }

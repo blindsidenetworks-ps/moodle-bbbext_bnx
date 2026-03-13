@@ -19,9 +19,10 @@ namespace bbbext_bnx;
 /**
  * Conformance tests for BNX subplugin state change handling.
  *
- * When a subplugin (e.g. bnx_preuploads) is disabled, its own event observers
- * are not active. By running observers in the always-enabled parent (bbbext_bnx),
- * we ensure that cascade config changes still fire correctly on enable.
+ * The parent plugin (bbbext_bnx) uses a generic callback discovery pattern:
+ * when any bbbext subplugin is enabled, it checks for a
+ * {@see \<plugin>\plugininfo_callbacks::on_enable()} method and invokes it.
+ * These tests verify that mechanism without referencing specific sidecars.
  *
  * @package   bbbext_bnx
  * @copyright 2026 onwards, Blindside Networks Inc
@@ -30,15 +31,14 @@ namespace bbbext_bnx;
  */
 final class subplugin_state_test extends \advanced_testcase {
     /**
-     * Enabling bnx_preuploads via config change must enable pre-upload presentations.
+     * Enabling a subplugin that defines plugininfo_callbacks::on_enable() must invoke it.
      *
-     * This test covers the case where bnx_preuploads was disabled (so its own
-     * observers are inactive) and is then re-enabled.
+     * Uses bnx_preuploads as a concrete example, but the observer logic is generic.
      *
      * @covers \bbbext_bnx\observer::subplugin_config_log_created
      * @return void
      */
-    public function test_enabling_bnx_preuploads_enables_preupload_setting(): void {
+    public function test_enabling_subplugin_invokes_on_enable_callback(): void {
         $this->resetAfterTest(true);
 
         set_config('bigbluebuttonbn_preuploadpresentation_editable', 0);
@@ -60,12 +60,12 @@ final class subplugin_state_test extends \advanced_testcase {
     }
 
     /**
-     * Disabling bnx_preuploads must NOT touch the pre-upload setting.
+     * Disabling a subplugin must NOT invoke the on_enable callback.
      *
      * @covers \bbbext_bnx\observer::subplugin_config_log_created
      * @return void
      */
-    public function test_disabling_bnx_preuploads_does_not_change_preupload_setting(): void {
+    public function test_disabling_subplugin_does_not_invoke_callback(): void {
         $this->resetAfterTest(true);
 
         set_config('bigbluebuttonbn_preuploadpresentation_editable', 1);
@@ -87,12 +87,12 @@ final class subplugin_state_test extends \advanced_testcase {
     }
 
     /**
-     * Events for unrelated plugins must be ignored.
+     * Events for plugins without plugininfo_callbacks must be silently ignored.
      *
      * @covers \bbbext_bnx\observer::subplugin_config_log_created
      * @return void
      */
-    public function test_unrelated_plugin_enable_is_ignored(): void {
+    public function test_subplugin_without_callback_is_ignored(): void {
         $this->resetAfterTest(true);
 
         set_config('bigbluebuttonbn_preuploadpresentation_editable', 0);
@@ -109,7 +109,33 @@ final class subplugin_state_test extends \advanced_testcase {
 
         observer::subplugin_config_log_created($event);
 
-        // Pre-upload setting must remain unchanged.
+        // Setting must remain unchanged — no callback class exists for that plugin.
+        $this->assertSame(0, (int) get_config(null, 'bigbluebuttonbn_preuploadpresentation_editable'));
+    }
+
+    /**
+     * Non-bbbext plugins must be ignored entirely.
+     *
+     * @covers \bbbext_bnx\observer::subplugin_config_log_created
+     * @return void
+     */
+    public function test_non_bbbext_plugin_is_ignored(): void {
+        $this->resetAfterTest(true);
+
+        set_config('bigbluebuttonbn_preuploadpresentation_editable', 0);
+
+        $event = \core\event\config_log_created::create([
+            'context' => \context_system::instance(),
+            'other' => [
+                'name'      => 'disabled',
+                'plugin'    => 'mod_assign',
+                'oldvalue'  => '1',
+                'value'     => '0',
+            ],
+        ]);
+
+        observer::subplugin_config_log_created($event);
+
         $this->assertSame(0, (int) get_config(null, 'bigbluebuttonbn_preuploadpresentation_editable'));
     }
 }
