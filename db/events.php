@@ -31,4 +31,8 @@ $observers = [
         'eventname' => '\\core\\event\\config_log_created',
         'callback' => '\\bbbext_bnx\\observer::config_log_created',
     ],
+    [
+        'eventname' => '\\core\\event\\config_log_created',
+        'callback' => '\\bbbext_bnx\\observer::subplugin_config_log_created',
+    ],
 ];

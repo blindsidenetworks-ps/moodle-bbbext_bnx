@@ -18,6 +18,7 @@ namespace bbbext_bnx;
 
 use bbbext_bnx\local\sidecar_state_manager;
 use core\plugininfo\mod;
+use mod_bigbluebuttonbn\local\config;
 
 /**
  * Event observer callbacks for BN Experience extension.
@@ -53,5 +54,34 @@ class observer {
         }
 
         sidecar_state_manager::apply_for_bnx_state($bnxdisabled);
+    }
+
+    /**
+     * React to subplugin state changes and enable related BigBlueButton settings.
+     *
+     * This observer runs in the always-enabled parent plugin so it fires even
+     * when the relevant subplugin is currently disabled.
+     *
+     * @param \core\event\config_log_created $event
+     * @return void
+     */
+    public static function subplugin_config_log_created(\core\event\config_log_created $event): void {
+        $other = $event->other ?? [];
+
+        if (($other['name'] ?? '') !== 'disabled') {
+            return;
+        }
+
+        $plugin = $other['plugin'] ?? '';
+        $disabled = (int)($other['value'] ?? 0) === 1;
+
+        if ($disabled) {
+            return;
+        }
+
+        // Enabling bnx_preuploads: ensure pre-upload presentations are editable.
+        if ($plugin === 'bbbext_bnx_preuploads') {
+            set_config('bigbluebuttonbn_preuploadpresentation_editable', 1);
+        }
     }
 }

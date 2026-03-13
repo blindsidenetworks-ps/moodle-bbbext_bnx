@@ -41,5 +41,18 @@ function xmldb_bbbext_bnx_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026031301, 'bbbext', 'bnx');
     }
 
+    if ($oldversion < 2026031302) {
+        // Backfill: if bnx_preuploads is already installed and enabled, ensure
+        // the pre-upload presentation setting is enabled. Previously this relied
+        // on an observer in the bnx_preuploads plugin itself, which is never
+        // active when the plugin is disabled (so enable → observe was broken).
+        $preuploadsdisabled = get_config('bbbext_bnx_preuploads', 'disabled');
+        if ($preuploadsdisabled !== false && (int)$preuploadsdisabled === 0) {
+            set_config('bigbluebuttonbn_preuploadpresentation_editable', 1);
+        }
+
+        upgrade_plugin_savepoint(true, 2026031302, 'bbbext', 'bnx');
+    }
+
     return true;
 }
