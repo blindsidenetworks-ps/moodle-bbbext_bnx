@@ -31,6 +31,13 @@
  * @return bool
  */
 function xmldb_bbbext_bnx_install() {
+    global $DB;
+
     // Enable the plugin by default.
     set_config('enabled', 1, 'bbbext_bnx');
+
+    // Ensure BigBlueButtonBN module is enabled when BNX is installed.
+    if ($DB->record_exists('modules', ['name' => 'bigbluebuttonbn'])) {
+        \core\plugininfo\mod::enable_plugin('bigbluebuttonbn', 1);
+    }
 }

@@ -15,19 +15,31 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for BigBlueButton BN Experience
+ * Upgrade.
  *
  * @package   bbbext_bnx
- * @copyright 2025 onwards, Blindside Networks Inc
+ * @copyright 2026 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * Perform the upgrade procedures.
+ *
+ * @param int $oldversion The old version number.
+ * @return bool Whether the upgrade was successful.
+ */
+function xmldb_bbbext_bnx_upgrade($oldversion) {
+    global $DB;
 
-$plugin->component    = 'bbbext_bnx';
-$plugin->release      = '1.0';
-$plugin->version      = 2026031301;
-$plugin->requires     = 2025100600; // Moodle 5.1.0 minimum.
-$plugin->supported    = [501, 502];
-$plugin->maturity     = MATURITY_STABLE;
+    if ($oldversion < 2026031301) {
+        // Ensure BigBlueButtonBN module is enabled for already-installed BNX sites.
+        if ($DB->record_exists('modules', ['name' => 'bigbluebuttonbn'])) {
+            \core\plugininfo\mod::enable_plugin('bigbluebuttonbn', 1);
+        }
+
+        upgrade_plugin_savepoint(true, 2026031301, 'bbbext', 'bnx');
+    }
+
+    return true;
+}

@@ -17,6 +17,7 @@
 namespace bbbext_bnx;
 
 use bbbext_bnx\local\sidecar_state_manager;
+use core\plugininfo\mod;
 
 /**
  * Event observer callbacks for BN Experience extension.
@@ -45,6 +46,12 @@ class observer {
         }
 
         $bnxdisabled = (int)($other['value'] ?? 0) === 1;
+
+        if (!$bnxdisabled) {
+            // Ensure BigBlueButtonBN module is enabled when BNX is enabled.
+            mod::enable_plugin('bigbluebuttonbn', 1);
+        }
+
         sidecar_state_manager::apply_for_bnx_state($bnxdisabled);
     }
 }
