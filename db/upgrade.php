@@ -42,10 +42,6 @@ function xmldb_bbbext_bnx_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026031304) {
-        // Sidecar-specific backfills previously in 2026031302 and 2026031303
-        // have been moved to each sidecar's own db/upgrade.php. This step
-        // replaces those with a generic discovery approach: invoke on_enable()
-        // for every currently-enabled bbbext sidecar that defines the callback.
         $plugins = \core_plugin_manager::instance()->get_installed_plugins('bbbext');
         if ($plugins) {
             foreach ($plugins as $name => $version) {
