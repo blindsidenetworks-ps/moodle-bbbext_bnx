@@ -345,7 +345,7 @@ class page_context_builder {
         $recordingsoutput[0]['first'] = true;
         foreach ($recordingsoutput as &$recording) {
             if (!empty($recording['date'])) {
-                $recording['date'] = userdate($recording['date'] / 1000, '%B %d, %Y, %I:%M %p');
+                $recording['date'] = userdate($recording['date'] / 1000, '%b %d, %Y, %I:%M %p');
             }
         }
         unset($recording);

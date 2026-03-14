@@ -30,7 +30,7 @@ export const setupPagination = () => {
         return;
     }
 
-    const rows = Array.from(tableContainer.querySelectorAll('.row.mb-3.align-items-center'));
+    const rows = Array.from(tableContainer.querySelectorAll('tr.bnx-recording-row'));
 
     const firstPageBtn = document.getElementById('firstPage');
     const prevPageBtn = document.getElementById('prevPage');
@@ -64,7 +64,7 @@ export const setupPagination = () => {
             const end = page * itemsPerPage;
 
             if (visibleIndex >= start && visibleIndex < end) {
-                row.style.display = 'flex';
+                row.style.display = '';
             } else {
                 row.style.display = 'none';
             }
@@ -148,7 +148,7 @@ export const setupPagination = () => {
 
     rows.forEach(row => {
         row.dataset.filtered = 'true';
-        row.style.display = 'flex';
+        row.style.display = '';
     });
 
     renderTable(currentPage);

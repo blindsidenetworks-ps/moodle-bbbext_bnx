@@ -240,7 +240,7 @@ class import implements renderable, templatable {
 
                 foreach ($recordingsoutput as &$recording) {
                     if (!empty($recording['date'])) {
-                        $recording['date'] = userdate($recording['date'] / 1000, '%B %d, %Y, %I:%M %p');
+                        $recording['date'] = userdate($recording['date'] / 1000, '%b %d, %Y, %I:%M %p');
                     }
                 }
 

@@ -28,7 +28,7 @@ export const setupSearch = () => {
         return;
     }
 
-    const rows = Array.from(tableContainer.querySelectorAll('.row.mb-3.align-items-center'));
+    const rows = Array.from(tableContainer.querySelectorAll('tr.bnx-recording-row'));
 
     const filterRows = () => {
         const query = searchInput.value.trim().toLowerCase();
