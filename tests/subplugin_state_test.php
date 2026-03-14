@@ -14,30 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace bbbext_bnx_teststub;
-
 /**
- * Stub plugininfo_callbacks used by subplugin_state_test.
- *
- * Simulates a sidecar plugin that defines an on_enable() callback,
- * without requiring the real plugin to be installed.
+ * Conformance tests for BNX subplugin state change handling.
  *
  * @package   bbbext_bnx
  * @copyright 2026 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
-class plugininfo_callbacks {
-    /**
-     * Stub on_enable callback that sets a traceable config value.
-     *
-     * @return void
-     */
-    public static function on_enable(): void {
-        set_config('bbbext_bnx_teststub_on_enable_called', 1);
-    }
-}
 
-// phpcs:ignore PSR1.Classes.ClassDeclaration.MultipleClasses
 namespace bbbext_bnx;
 
 /**
@@ -54,6 +39,16 @@ namespace bbbext_bnx;
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 final class subplugin_state_test extends \advanced_testcase {
+    /**
+     * Load the stub sidecar fixture so class_exists() resolves during observer tests.
+     *
+     * @return void
+     */
+    protected function setUp(): void {
+        parent::setUp();
+        require_once(__DIR__ . '/fixtures/stub_plugininfo_callbacks.php');
+    }
+
     /**
      * Enabling a subplugin that defines plugininfo_callbacks::on_enable() must invoke it.
      *
