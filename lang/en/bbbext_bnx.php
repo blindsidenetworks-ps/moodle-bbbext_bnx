@@ -31,6 +31,7 @@ $string['approvalbeforejoin_default_desc'] = 'When enabled, participants must wa
 $string['approvalbeforejoin_editable'] = 'Allow teachers to change the Waiting Room setting per activity';
 $string['approvalbeforejoin_editable_desc'] = 'When enabled, teachers can turn the Waiting Room on or off for individual activities.';
 $string['approvalbeforejoin_help'] = 'If enabled, participants must be approved by a moderator before joining the session.';
+$string['config_general_description_credentials_preconfigured'] = 'BigBlueButton server credentials are configured in config.php and cannot be edited here.';
 $string['mod_form_block_room'] = 'Room Settings +';
 $string['navlabel'] = 'BigBlueButton +';
 $string['options_disabled'] = 'Disabled';

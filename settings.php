@@ -15,7 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO describe file settings
+ * Settings for bbbext_bnx extension.
+ *
+ * Configures BN Experience features and conditionally hides the setup instructions
+ * when BigBlueButton is pre-configured via config.php.
  *
  * @package    bbbext_bnx
  * @copyright 2025 onwards, Blindside Networks Inc
@@ -24,6 +27,28 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+
+// Hide the setup description if BigBlueButton is already configured via config.php.
+// Check if BigBlueButton is pre-configured via $CFG->bigbluebuttonbn array.
+global $CFG;
+$isconfigured = !empty($CFG->bigbluebuttonbn['server_url'] ?? null)
+    && !empty($CFG->bigbluebuttonbn['shared_secret'] ?? null);
+
+// Locate the BigBlueButton General settings page and replace the setup description if configured.
+$bbbgeneralpage = $ADMIN->locate('modsettingbigbluebuttonbn');
+if (
+    $isconfigured
+    && ($bbbgeneralpage instanceof admin_settingpage)
+    && isset($bbbgeneralpage->settings->bigbluebuttonbn_config_general)
+) {
+    // Replace the setup description with a message indicating credentials are configured in config.php.
+    $message = get_string('config_general_description_credentials_preconfigured', 'bbbext_bnx');
+    $bbbgeneralpage->settings->bigbluebuttonbn_config_general = new admin_setting_heading(
+        'bigbluebuttonbn_config_general',
+        '',
+        $message
+    );
+}
 
 if ($ADMIN->fulltree) {
     $featuresbysection = [
