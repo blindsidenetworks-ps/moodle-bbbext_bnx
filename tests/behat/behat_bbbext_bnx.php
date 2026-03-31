@@ -25,6 +25,9 @@
 
 require_once(__DIR__ . '/../../../../../../lib/behat/behat_base.php');
 
+use bbbext_bnx\local\helpers\joinurl_helper;
+use mod_bigbluebuttonbn\instance;
+
 /**
  * Behat steps for BigBlueButton BN Experience.
  *
@@ -57,5 +60,21 @@ class behat_bbbext_bnx extends behat_base {
         // To disable, we set 'disabled' to 1 (see bbbext::enable_plugin).
         set_config('disabled', 1, 'bbbext_' . $pluginname);
         \core_plugin_manager::reset_caches();
+    }
+
+    /**
+     * Navigate to BNX guest page for a BigBlueButton activity.
+     *
+     * @Given /^I am on the "(?P<identifier_string>(?:[^"\\]|\\.)*)" "bbbext_bnx > BigblueButtonBN Guest" page$/
+     * @param string $identifier activity name identifier
+     * @return void
+     */
+    public function i_am_on_bnx_guest_page(string $identifier): void {
+        $cm = $this->get_cm_by_activity_name('bigbluebuttonbn', $identifier);
+        $instance = instance::get_from_cmid($cm->id);
+        $url = joinurl_helper::build_guest_join_url($instance);
+        // Pre-fill password to simplify guest submission in Behat.
+        $url->param('password', $instance->get_guest_access_password());
+        $this->getSession()->visit($this->locate_path($url->out(false)));
     }
 }
