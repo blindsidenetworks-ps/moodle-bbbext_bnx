@@ -30,71 +30,71 @@ require_once($CFG->libdir . '/formslib.php');
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 class guest_login extends \moodleform {
-	/**
-	 * Form definition.
-	 *
-	 * @return void
-	 */
-	protected function definition() {
-		global $USER;
+    /**
+     * Form definition.
+     *
+     * @return void
+     */
+    protected function definition() {
+        global $USER;
 
-		$mform = $this->_form;
-		$mform->addElement(
-			'text',
-			'username',
-			get_string('guestaccess_username', 'mod_bigbluebuttonbn')
-		);
-		$mform->setType('username', PARAM_NOTAGS);
+        $mform = $this->_form;
+        $mform->addElement(
+            'text',
+            'username',
+            get_string('guestaccess_username', 'mod_bigbluebuttonbn')
+        );
+        $mform->setType('username', PARAM_NOTAGS);
 
-		if (isloggedin() && !isguestuser()) {
-			$mform->setConstant('username', fullname($USER));
-			$mform->freeze('username');
-		} else {
-			$mform->addRule(
-				'username',
-				get_string('required'),
-				'required',
-				null,
-				'client'
-			);
-		}
+        if (isloggedin() && !isguestuser()) {
+            $mform->setConstant('username', fullname($USER));
+            $mform->freeze('username');
+        } else {
+            $mform->addRule(
+                'username',
+                get_string('required'),
+                'required',
+                null,
+                'client',
+            );
+        }
 
-		$mform->addElement(
-			'password',
-			'password',
-			get_string('guestaccess_password', 'mod_bigbluebuttonbn')
-		);
-		$mform->setType('password', PARAM_RAW);
-		$mform->addRule(
-			'password',
-			get_string('required'),
-			'required',
-			null,
-			'client'
-		);
-		$mform->addElement('hidden', 'uid', $this->_customdata['uid']);
-		$mform->setType('uid', PARAM_ALPHANUMEXT);
+        $mform->addElement(
+            'password',
+            'password',
+            get_string('guestaccess_password', 'mod_bigbluebuttonbn')
+        );
+        $mform->setType('password', PARAM_RAW);
+        $mform->addRule(
+            'password',
+            get_string('required'),
+            'required',
+            null,
+            'client'
+        );
+        $mform->addElement('hidden', 'uid', $this->_customdata['uid']);
+        $mform->setType('uid', PARAM_ALPHANUMEXT);
 
-		$this->add_action_buttons(
-			false,
-			get_string('guestaccess_join_meeting', 'mod_bigbluebuttonbn')
-		);
-	}
+        $this->add_action_buttons(
+            false,
+            get_string('guestaccess_join_meeting', 'mod_bigbluebuttonbn')
+        );
+    }
 
-	/**
-	 * Validate form.
-	 *
-	 * @param array $data
-	 * @param array $files
-	 * @return array
-	 * @throws \coding_exception
-	 */
-	public function validation($data, $files): array {
-		$errors = parent::validation($data, $files);
-		$instance = $this->_customdata['instance'];
-		if ($data['password'] != $instance->get_guest_access_password()) {
-			$errors['password'] = get_string('guestaccess_meeting_invalid_password', 'mod_bigbluebuttonbn');
-		}
-		return $errors;
-	}
+    /**
+     * Validate form.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     * @throws \coding_exception
+     */
+    public function validation($data, $files): array {
+        $errors = parent::validation($data, $files);
+        $instance = $this->_customdata['instance'];
+        if ($data['password'] != $instance->get_guest_access_password()) {
+            $errors['password'] = get_string('guestaccess_meeting_invalid_password', 'mod_bigbluebuttonbn');
+        }
+        return $errors;
+    }
 }
