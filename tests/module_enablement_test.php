@@ -90,11 +90,11 @@ final class module_enablement_test extends \advanced_testcase {
         mod::enable_plugin('bigbluebuttonbn', 0);
         $this->assert_bigbluebuttonbn_enabled(false);
 
-        set_config('version', 2026031300, 'bbbext_bnx');
+        set_config('version', 2026031100, 'bbbext_bnx');
 
         require_once($CFG->libdir . '/upgradelib.php');
         require_once($CFG->dirroot . '/mod/bigbluebuttonbn/extension/bnx/db/upgrade.php');
-        xmldb_bbbext_bnx_upgrade(2026031300);
+        xmldb_bbbext_bnx_upgrade(2026031100);
 
         $this->assert_bigbluebuttonbn_enabled(true);
     }
