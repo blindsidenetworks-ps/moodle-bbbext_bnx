@@ -17,6 +17,7 @@
 namespace bbbext_bnx\local\helpers;
 
 use bbbext_bnx\reminders_utils;
+use pix_icon;
 
 /**
  * Helper class for mod_form functionality.
@@ -142,7 +143,7 @@ class mod_form_helper {
      * @return void
      */
     public static function add_reminder_fields(\MoodleQuickForm &$mform, ?\stdClass $bigbluebuttonbndata = null): void {
-        global $DB;
+        global $DB, $OUTPUT;
 
         $mform->addElement('header', 'bnx_reminders', get_string('mod_form_reminders', 'bbbext_bnx'));
         $mform->addElement('static', 'bnx_reminders_desc', '', get_string('mod_form_reminders_desc', 'bbbext_bnx'));
@@ -164,6 +165,7 @@ class mod_form_helper {
         $mform->setDefault('bnx_remindertoguestsenabled', 0);
         $mform->setType('bnx_remindertoguestsenabled', PARAM_BOOL);
         $mform->hideIf('bnx_remindertoguestsenabled', 'bnx_reminderenabled', 'eq', 0);
+        $mform->disabledIf('bnx_remindertoguestsenabled', 'openingtime[enabled]', 'notchecked', 0);
 
         // Determine how many timespans to show.
         $existingtimespans = [];
@@ -173,16 +175,32 @@ class mod_form_helper {
                 ['bigbluebuttonbnid' => $bigbluebuttonbndata->id]
             );
         }
-        $paramcount = max(1, count($existingtimespans));
+        $defaultcount = max(1, count($existingtimespans));
+        $paramcount = optional_param('bnx_paramcount', $defaultcount, PARAM_INT);
+        if (optional_param('bnx_addparamgroup', 0, PARAM_RAW)) {
+            $paramcount++;
+        }
 
-        $mform->addElement('hidden', 'bnx_paramcount', $paramcount);
+        $isdeleting = optional_param_array('bnx_paramdelete', [], PARAM_RAW);
+        foreach (array_keys($isdeleting) as $index) {
+            $mform->registerNoSubmitButton("bnx_paramdelete[$index]");
+        }
+
+        $mform->addElement('hidden', 'bnx_paramcount');
         $mform->setType('bnx_paramcount', PARAM_INT);
+        $mform->setConstants(['bnx_paramcount' => $paramcount]);
+
+        $mform->addElement('hidden', 'bnx_openingtime');
+        $mform->setType('bnx_openingtime', PARAM_INT);
+        $mform->setConstants(['bnx_openingtime' => $bigbluebuttonbndata->openingtime ?? 0]);
 
         $timespanoptions = reminders_utils::get_timespan_options();
         $timespanvalues = array_values(array_map(fn($r) => $r->timespan, $existingtimespans));
+        $bellicon = new pix_icon('i/bell', get_string('timespan:bell', 'bbbext_bnx'), 'bbbext_bnx');
 
         for ($i = 0; $i < $paramcount; $i++) {
             $group = [];
+            $group[] = $mform->createElement('html', $OUTPUT->render($bellicon));
             $group[] = $mform->createElement('select', "bnx_timespan[$i]", '', $timespanoptions);
             $group[] = $mform->createElement(
                 'static',
@@ -190,12 +208,61 @@ class mod_form_helper {
                 '',
                 get_string('reminder:message', 'bbbext_bnx')
             );
-            $mform->addGroup($group, "bnx_timespangroup[$i]", get_string('timespan:bell', 'bbbext_bnx'), ' ', false);
-            $mform->hideIf("bnx_timespangroup[$i]", 'bnx_reminderenabled', 'eq', 0);
+            $group[] = $mform->createElement(
+                'submit',
+                "bnx_paramdelete[$i]",
+                get_string('delete'),
+                [],
+                false,
+                ['customclassoverride' => 'btn btn-secondary float-left']
+            );
+
+            $mform->addGroup($group, "bnx_timespangroup[$i]", '', [' '], false);
+            $mform->hideIf("bnx_timespangroup[$i]", 'bnx_reminderenabled', 'notchecked', 0);
+            $mform->disabledIf("bnx_timespangroup[$i]", 'openingtime[enabled]', 'notchecked', 0);
+            $mform->setType("bnx_timespan[$i]", PARAM_ALPHANUM);
+            $mform->setType("bnx_paramdelete[$i]", PARAM_RAW);
+            $mform->disabledIf("bnx_timespan[$i]", 'openingtime[enabled]', 'notchecked', 0);
+            $mform->registerNoSubmitButton("bnx_paramdelete[$i]");
 
             if (isset($timespanvalues[$i])) {
                 $mform->setDefault("bnx_timespan[$i]", $timespanvalues[$i]);
             }
+        }
+
+        $mform->addElement('submit', 'bnx_addparamgroup', get_string('addreminder', 'bbbext_bnx'));
+        $mform->hideIf('bnx_addparamgroup', 'bnx_reminderenabled');
+        $mform->disabledIf('bnx_addparamgroup', 'openingtime[enabled]', 'notchecked', 0);
+        $mform->setType('bnx_addparamgroup', PARAM_TEXT);
+        $mform->registerNoSubmitButton('bnx_addparamgroup');
+    }
+
+    /**
+     * Apply post-data cleanup for reminder rows when a delete button is pressed.
+     *
+     * @param \MoodleQuickForm $mform The form instance
+     * @return void
+     */
+    public static function reminder_definition_after_data(\MoodleQuickForm &$mform): void {
+        $isdeleting = optional_param_array('bnx_paramdelete', [], PARAM_RAW);
+        if (empty($isdeleting)) {
+            return;
+        }
+
+        $firstindex = array_key_first($isdeleting);
+        $paramcount = optional_param('bnx_paramcount', 0, PARAM_INT);
+        for ($index = $firstindex; $index < $paramcount; $index++) {
+            $nextindex = $index + 1;
+            if ($mform->elementExists("bnx_timespan[$nextindex]")) {
+                $mform->getElement("bnx_timespan[$index]")
+                    ->setValue($mform->getElementValue("bnx_timespan[$nextindex]"));
+            }
+        }
+
+        $newparamcount = $paramcount - 1;
+        $mform->removeElement("bnx_timespangroup[$newparamcount]");
+        if ($mform->elementExists('bnx_paramcount')) {
+            $mform->getElement('bnx_paramcount')->setValue($newparamcount);
         }
     }
 }

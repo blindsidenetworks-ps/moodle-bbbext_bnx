@@ -193,11 +193,18 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
             ['bigbluebuttonbnid' => $moduleid]
         );
         $existingtimespans = array_map(fn($r) => $r->timespan, $existingreminders);
+        $openingtimechanged = isset($data->bnx_openingtime, $data->openingtime)
+            && (int)$data->bnx_openingtime !== (int)$data->openingtime;
 
         // Delete removed timespans.
         foreach ($existingreminders as $existing) {
             if (!in_array($existing->timespan, $submittedtimespans)) {
                 $DB->delete_records(self::REMINDERS_TABLE, ['id' => $existing->id]);
+                continue;
+            }
+
+            if ($openingtimechanged) {
+                $DB->set_field(self::REMINDERS_TABLE, 'lastsent', 0, ['id' => $existing->id]);
             }
         }
 

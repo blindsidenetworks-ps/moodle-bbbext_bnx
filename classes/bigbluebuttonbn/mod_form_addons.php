@@ -125,6 +125,19 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
     }
 
     /**
+     * Apply post-data adjustments after form values are loaded.
+     *
+     * @return void
+     */
+    public function definition_after_data(): void {
+        if (!reminders_utils::is_reminders_enabled()) {
+            return;
+        }
+
+        mod_form_helper::reminder_definition_after_data($this->mform);
+    }
+
+    /**
      * Add supplementary form fields contributed by the addon.
      *
      * @return void
@@ -144,19 +157,16 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
             $this->mform->setDefault('guestjoinurl', joinurl_helper::build_guest_join_url($instance)->out(false));
         }
 
-        // Check if the feature is editable.
-        $editable = mod_form_helper::is_feature_editable('approvalbeforejoin');
-        if (!$editable) {
-            return;
-        }
-        // Add the approval before join checkbox.
-        mod_form_helper::add_approval_before_join_checkbox(
-            $this->mform,
-            mod_form_helper::get_feature_default('approvalbeforejoin')
-        );
+        // Add the approval before join checkbox when editable.
+        if (mod_form_helper::is_feature_editable('approvalbeforejoin')) {
+            mod_form_helper::add_approval_before_join_checkbox(
+                $this->mform,
+                mod_form_helper::get_feature_default('approvalbeforejoin')
+            );
 
-        // Remove the wait room setting as it's replaced by approval before join.
-        mod_form_helper::remove_element($this->mform, 'wait');
+            // Remove the wait room setting as it's replaced by approval before join.
+            mod_form_helper::remove_element($this->mform, 'wait');
+        }
 
         // Add reminder fields if the feature is enabled.
         if (reminders_utils::is_reminders_enabled() && mod_form_helper::is_feature_editable('reminder')) {
@@ -182,6 +192,15 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
             $value = $data[$field];
             if (!is_bool($value) && !is_numeric($value)) {
                 $errors[$field] = get_string('err_numeric', 'form');
+            }
+        }
+
+        if (!empty($data['bnx_timespan'])) {
+            $timespans = is_array($data['bnx_timespan']) ? $data['bnx_timespan'] : [$data['bnx_timespan']];
+            $timespans = array_values(array_filter($timespans));
+            $unique = array_unique($timespans);
+            if (count($unique) !== count($timespans)) {
+                $errors['bnx_addparamgroup'] = get_string('error:duplicate', 'bbbext_bnx');
             }
         }
 

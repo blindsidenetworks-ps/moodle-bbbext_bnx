@@ -145,4 +145,60 @@ final class reminder_mod_instance_helper_test extends \advanced_testcase {
         unset_config('disabled', 'bbbext_bnx');
         \core_plugin_manager::reset_caches();
     }
+
+    /**
+     * Test existing reminders reset lastsent when opening time changes.
+     *
+     * @return void
+     * @covers ::update_instance
+     */
+    public function test_sync_reminder_data_resets_lastsent_on_openingtime_change(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $bbbgenerator = $generator->get_plugin_generator('mod_bigbluebuttonbn');
+        $bbbinstance = instance::get_from_instanceid(
+            $bbbgenerator->create_instance(['course' => $course])->id
+        );
+
+        $bnxgenerator = $generator->get_plugin_generator('bbbext_bnx');
+        $bnxgenerator->enable_reminder($bbbinstance->get_instance_id());
+        $bnxgenerator->add_reminder([
+            'bigbluebuttonbnid' => $bbbinstance->get_instance_id(),
+            'timespan' => 'PT1H',
+            'lastsent' => time(),
+        ]);
+        $bnxgenerator->add_reminder([
+            'bigbluebuttonbnid' => $bbbinstance->get_instance_id(),
+            'timespan' => 'PT2H',
+            'lastsent' => time(),
+        ]);
+
+        $modinstancehelper = new mod_instance_helper();
+        $modinstancehelperref = new ReflectionClass($modinstancehelper);
+        $syncmethod = $modinstancehelperref->getMethod('sync_reminder_data');
+        $syncmethod->setAccessible(true);
+
+        $data = $bbbinstance->get_instance_data();
+        $data->bnx_reminderenabled = true;
+        $data->bnx_paramcount = 2;
+        $data->bnx_timespan = ['PT1H', 'PT2H'];
+        $data->bnx_openingtime = (int)$data->openingtime;
+        $data->openingtime = (int)$data->openingtime + 60;
+        $syncmethod->invokeArgs($modinstancehelper, [$data]);
+
+        $records = $DB->get_records(
+            mod_instance_helper::REMINDERS_TABLE,
+            ['bigbluebuttonbnid' => $bbbinstance->get_instance_id()]
+        );
+
+        $this->assertCount(2, $records);
+        foreach ($records as $record) {
+            $this->assertEquals(0, (int)$record->lastsent);
+        }
+    }
 }

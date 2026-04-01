@@ -113,6 +113,48 @@ final class mod_form_addons_test extends \advanced_testcase {
     }
 
     /**
+     * Test validation rejects duplicate reminder timespans.
+     *
+     * @return void
+     */
+    public function test_validation_rejects_duplicate_reminder_timespans(): void {
+        global $CFG;
+
+        require_once($CFG->libdir . '/formslib.php');
+        $form = new \MoodleQuickForm('bnxform', 'post', '');
+        $addons = new mod_form_addons($form);
+
+        $data = [
+            'bnx_timespan' => ['PT1H', 'PT1H'],
+        ];
+
+        $errors = $addons->validation($data, []);
+        $this->assertArrayHasKey('bnx_addparamgroup', $errors);
+    }
+
+    /**
+     * Test reminder fields are still added when approval-before-join is not editable.
+     *
+     * @return void
+     */
+    public function test_add_fields_adds_reminders_even_if_approvalbeforejoin_not_editable(): void {
+        global $CFG;
+
+        require_once($CFG->libdir . '/formslib.php');
+
+        set_config('approvalbeforejoin_editable', 0, 'bbbext_bnx');
+        set_config('reminder_editable', 1, 'bbbext_bnx');
+        set_config('reminder_default', 1, 'bbbext_bnx');
+
+        $form = new \MoodleQuickForm('bnxform', 'post', '');
+        $addons = new mod_form_addons($form);
+
+        $addons->add_fields();
+
+        $this->assertTrue($form->elementExists('bnx_reminders'));
+    }
+
+    /**
      * Helper to create a BigBlueButton activity for tests.
      *
      * @return \stdClass
