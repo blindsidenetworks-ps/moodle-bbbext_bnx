@@ -43,6 +43,16 @@ use stdClass;
  */
 class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addons {
     /**
+     * Form header labels overridden by BNX.
+     *
+     * @var array<string, string>
+     */
+    private const HEADER_STRING_OVERRIDES = [
+        'room' => 'mod_form_block_room',
+        'guestaccess' => 'mod_form_block_guestaccess',
+    ];
+
+    /**
      * Service used to fetch and persist settings.
      * @var bnx_settings_service_interface
      */
@@ -145,12 +155,7 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
     public function add_fields(): void {
         // A nav label override is handled globally via hook_callbacks::before_footer().
 
-        // Override the core Room block header with the BNX-specific label.
-        mod_form_helper::rename_header(
-            $this->mform,
-            'room',
-            get_string('mod_form_block_room', 'bbbext_bnx')
-        );
+        mod_form_helper::apply_header_overrides($this->mform, self::HEADER_STRING_OVERRIDES);
 
         if (!empty($this->bigbluebuttonbndata->id) && $this->mform->elementExists('guestjoinurl')) {
             $instance = instance::get_from_instanceid((int)$this->bigbluebuttonbndata->id);

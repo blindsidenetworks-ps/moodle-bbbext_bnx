@@ -68,6 +68,28 @@ class mod_form_helper {
     }
 
     /**
+     * Apply header label overrides using language string keys.
+     *
+     * @param \MoodleQuickForm $mform The form instance
+     * @param array $headerstringoverrides header name => lang string key
+     * @param string $component Language component for string lookup
+     * @return void
+     */
+    public static function apply_header_overrides(
+        \MoodleQuickForm &$mform,
+        array $headerstringoverrides,
+        string $component = 'bbbext_bnx'
+    ): void {
+        foreach ($headerstringoverrides as $headername => $stringkey) {
+            self::rename_header(
+                $mform,
+                $headername,
+                get_string($stringkey, $component)
+            );
+        }
+    }
+
+    /**
      * Add elements above existing form elements e.g headers.
      *
      * @param \MoodleQuickForm $mform The form instance
