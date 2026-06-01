@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/bigbluebuttonbn/extension/bnx/db" VERSION="20251028" COMMENT="XMLDB file for Moodle mod_bigbluebuttonbn extension bnx"
+<XMLDB PATH="mod/bigbluebuttonbn/extension/bnx/db" VERSION="2026040100" COMMENT="XMLDB file for Moodle mod_bigbluebuttonbn extension bnx"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >
