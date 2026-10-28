@@ -69,8 +69,6 @@ final class action_url_parameters_test extends \advanced_testcase {
         array $expectedjoin,
         array $joindata,
     ): void {
-        global $DB;
-
         // Configure admin settings.
         set_config('approvalbeforejoin_editable', $editable, 'bbbext_bnx');
         set_config('approvalbeforejoin_default', $default, 'bbbext_bnx');
@@ -82,12 +80,8 @@ final class action_url_parameters_test extends \advanced_testcase {
 
         $bnxid = $this->ensure_bnx_record($instanceid);
         if ($editable) {
-            $DB->insert_record('bbbext_bnx_settings', [
-                'bnxid' => $bnxid,
-                'name' => 'approvalbeforejoin',
-                'value' => (string)(int)$instancesetting,
-                'timecreated' => time(),
-                'timemodified' => time(),
+            bnx_settings_service::get_service()->set_settings($bnxid, [
+                'approvalbeforejoin' => (int)$instancesetting,
             ]);
         }
 
@@ -147,6 +141,8 @@ final class action_url_parameters_test extends \advanced_testcase {
      * @return void
      */
     public function test_lock_settings_parameters_use_instance_values(): void {
+        set_config('approvalbeforejoin_default', 0, 'bbbext_bnx');
+        set_config('approvalbeforejoin_editable', 0, 'bbbext_bnx');
         foreach (['cam', 'mic', 'privatechat', 'publicchat', 'notes', 'userlist', 'hideviewerscursor'] as $feature) {
             set_config($feature . '_editable', 1, 'bbbext_bnx');
             set_config($feature . '_default', 1, 'bbbext_bnx');

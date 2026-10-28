@@ -110,6 +110,8 @@ final class check_email_reminder_test extends \advanced_testcase {
      * Set up test fixtures.
      */
     public function setUp(): void {
+        global $DB;
+
         parent::setUp();
 
         $this->preventResetByRollback();
@@ -124,6 +126,8 @@ final class check_email_reminder_test extends \advanced_testcase {
         $this->bbbinstance = instance::get_from_instanceid($bbbgenerator->create_instance([
             'course' => $course,
         ])->id);
+        // Each test supplies its own reminder schedule.
+        $DB->delete_records('bbbext_bnx_reminders', ['bigbluebuttonbnid' => $this->bbbinstance->get_instance_id()]);
 
         for ($i = 1; $i < 4; $i++) {
             $this->students[] = $generator->create_and_enrol(

@@ -155,6 +155,14 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
      * @return void
      */
     public function add_fields(): void {
+        // Distinguish form submissions, where unchecked checkboxes can be absent,
+        // from programmatic creations that did not submit the BNX form at all.
+        $this->mform->addElement('hidden', 'bnx_form_submitted', 1);
+        $this->mform->setType('bnx_form_submitted', PARAM_INT);
+        $this->mform->setDefault('bnx_form_submitted', 1);
+        $this->mform->addElement('hidden', 'bnx_openingtime');
+        $this->mform->setType('bnx_openingtime', PARAM_INT);
+        $this->mform->setConstants(['bnx_openingtime' => $this->bigbluebuttonbndata->openingtime ?? 0]);
         // A nav label override is handled globally via hook_callbacks::before_footer().
 
         mod_form_helper::apply_header_overrides($this->mform, self::HEADER_STRING_OVERRIDES);

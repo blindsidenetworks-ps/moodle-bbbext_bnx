@@ -50,6 +50,8 @@ final class reminder_mod_instance_helper_test extends \advanced_testcase {
 
         $bnxgenerator = $generator->get_plugin_generator('bbbext_bnx');
         $bnxgenerator->enable_reminder($bbbinstance->get_instance_id());
+        // These tests construct their own schedule, independent of creation defaults.
+        $DB->delete_records(mod_instance_helper::REMINDERS_TABLE, ['bigbluebuttonbnid' => $bbbinstance->get_instance_id()]);
         $bnxgenerator->add_reminder([
             'bigbluebuttonbnid' => $bbbinstance->get_instance_id(),
             'timespan' => 'PT1H',
@@ -163,6 +165,8 @@ final class reminder_mod_instance_helper_test extends \advanced_testcase {
 
         $bnxgenerator = $generator->get_plugin_generator('bbbext_bnx');
         $bnxgenerator->enable_reminder($bbbinstance->get_instance_id());
+        // These tests construct their own schedule, independent of creation defaults.
+        $DB->delete_records(mod_instance_helper::REMINDERS_TABLE, ['bigbluebuttonbnid' => $bbbinstance->get_instance_id()]);
         $bnxgenerator->add_reminder([
             'bigbluebuttonbnid' => $bbbinstance->get_instance_id(),
             'timespan' => 'PT1H',

@@ -168,11 +168,61 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
      * @return void
      */
     public function add_instance(stdClass $bigbluebuttonbn) {
+        $this->apply_creation_defaults($bigbluebuttonbn);
         $bnxid = $this->persist_bnx_record($bigbluebuttonbn);
         if ($bnxid !== null) {
             $this->persist_settings($bnxid, $bigbluebuttonbn);
         }
         $this->sync_reminder_data($bigbluebuttonbn);
+    }
+
+    /**
+     * Apply form defaults when an activity is created without BNX form fields.
+     *
+     * Explicitly submitted values, including zero, are preserved.
+     *
+     * @param stdClass $data Activity data after the parent activity was created.
+     * @return void
+     */
+    private function apply_creation_defaults(stdClass $data): void {
+        global $DB;
+
+        if (empty($data->bnx_form_submitted)) {
+            if (get_config('bbbext_bnx', 'approvalbeforejoin_editable') && !property_exists($data, 'approvalbeforejoin')) {
+                $data->approvalbeforejoin = (int) !empty(get_config('bbbext_bnx', 'approvalbeforejoin_default'));
+                // The BNX form removes the parent wait control when approval is editable.
+                $moduleid = $this->resolve_module_id($data);
+                if ($moduleid !== null) {
+                    $DB->set_field('bigbluebuttonbn', 'wait', 0, ['id' => $moduleid]);
+                    $data->wait = 0;
+                }
+            }
+
+            foreach (self::LOCK_FEATURE_DEFINITIONS as $feature => $definition) {
+                $field = $definition['field'];
+                if (!property_exists($data, $field)) {
+                    $value = get_config('bbbext_bnx', $feature . '_default');
+                    $data->{$field} = (int) ($value === false ? $definition['default'] : !empty($value));
+                }
+            }
+        } else if (get_config('bbbext_bnx', 'reminder_editable')) {
+            // Preserve omitted unchecked controls when the reminder fields were rendered.
+            return;
+        }
+
+        if (!property_exists($data, 'bnx_reminderenabled')) {
+            $data->bnx_reminderenabled = (int) !empty(get_config('bbbext_bnx', 'reminder_default'));
+        }
+        if (!property_exists($data, 'bnx_remindertoguestsenabled')) {
+            $data->bnx_remindertoguestsenabled = 0;
+        }
+        if (!property_exists($data, 'bnx_timespan') && !property_exists($data, 'bnx_paramcount')) {
+            $data->bnx_timespan = [\bbbext_bnx\reminders_utils::ONE_HOUR];
+        }
+        if (!property_exists($data, 'bnx_paramcount') && property_exists($data, 'bnx_timespan')) {
+            $data->bnx_paramcount = is_array($data->bnx_timespan) ? count($data->bnx_timespan) :
+                (empty($data->bnx_timespan) ? 0 : 1);
+        }
     }
 
     /**
@@ -243,10 +293,21 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
         // Sync the reminder enabled flags via bnx_settings.
         $bnxid = $this->get_bnx_id($moduleid);
         if ($bnxid !== null) {
-            $this->service->set_settings($bnxid, [
-                'reminderenabled' => !empty($data->bnx_reminderenabled) ? '1' : '0',
-                'remindertoguestsenabled' => !empty($data->bnx_remindertoguestsenabled) ? '1' : '0',
-            ]);
+            $flags = [];
+            $submittedcontrols = !empty($data->bnx_form_submitted) && get_config('bbbext_bnx', 'reminder_editable');
+            foreach (['reminderenabled', 'remindertoguestsenabled'] as $setting) {
+                $field = 'bnx_' . $setting;
+                if ($submittedcontrols || property_exists($data, $field)) {
+                    $flags[$setting] = !empty($data->{$field}) ? '1' : '0';
+                }
+            }
+            $this->service->set_settings($bnxid, $flags);
+        }
+
+        $openingtimechanged = isset($data->bnx_openingtime, $data->openingtime)
+            && (int)$data->bnx_openingtime !== (int)$data->openingtime;
+        if ($openingtimechanged) {
+            $DB->set_field(self::REMINDERS_TABLE, 'lastsent', 0, ['bigbluebuttonbnid' => $moduleid]);
         }
 
         // Sync timespan rows.
@@ -269,18 +330,11 @@ class mod_instance_helper extends \mod_bigbluebuttonbn\local\extension\mod_insta
             ['bigbluebuttonbnid' => $moduleid]
         );
         $existingtimespans = array_map(fn($r) => $r->timespan, $existingreminders);
-        $openingtimechanged = isset($data->bnx_openingtime, $data->openingtime)
-            && (int)$data->bnx_openingtime !== (int)$data->openingtime;
-
         // Delete removed timespans.
         foreach ($existingreminders as $existing) {
             if (!in_array($existing->timespan, $submittedtimespans)) {
                 $DB->delete_records(self::REMINDERS_TABLE, ['id' => $existing->id]);
                 continue;
-            }
-
-            if ($openingtimechanged) {
-                $DB->set_field(self::REMINDERS_TABLE, 'lastsent', 0, ['id' => $existing->id]);
             }
         }
 

@@ -290,10 +290,6 @@ class mod_form_helper {
         $mform->setType('bnx_paramcount', PARAM_INT);
         $mform->setConstants(['bnx_paramcount' => $paramcount]);
 
-        $mform->addElement('hidden', 'bnx_openingtime');
-        $mform->setType('bnx_openingtime', PARAM_INT);
-        $mform->setConstants(['bnx_openingtime' => $bigbluebuttonbndata->openingtime ?? 0]);
-
         $timespanoptions = reminders_utils::get_timespan_options();
         $timespanvalues = array_values(array_map(fn($r) => $r->timespan, $existingtimespans));
         $bellicon = new pix_icon('i/bell', get_string('timespan:bell', 'bbbext_bnx'), 'bbbext_bnx');

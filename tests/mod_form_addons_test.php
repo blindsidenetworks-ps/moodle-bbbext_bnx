@@ -193,6 +193,23 @@ final class mod_form_addons_test extends \advanced_testcase {
     }
 
     /**
+     * The previous opening time is included even when reminder controls are hidden.
+     *
+     * @return void
+     */
+    public function test_add_fields_tracks_opening_time_when_reminders_not_editable(): void {
+        global $CFG;
+
+        require_once($CFG->libdir . '/formslib.php');
+        set_config('reminder_editable', 0, 'bbbext_bnx');
+        $form = new \MoodleQuickForm('bnxform', 'post', '');
+        $addons = new mod_form_addons($form, (object) ['openingtime' => 12345]);
+        $addons->add_fields();
+        $this->assertTrue($form->elementExists('bnx_openingtime'));
+        $this->assertFalse($form->elementExists('bnx_reminders'));
+    }
+
+    /**
      * Test reminder add-button requests use sanitized text input and still add a row.
      *
      * @return void
